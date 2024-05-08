@@ -144,7 +144,7 @@ const closeTab = () => {
 
 在 vue.js 的 mounted 生命周期内，开始加载进度条。
 
-```crmsh
+```js
 NProgress.start()
 ```
 

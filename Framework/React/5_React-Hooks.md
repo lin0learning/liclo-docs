@@ -58,7 +58,7 @@ function Users() {
 
 函数式组件在修改自身state数据时，如果直接修改，不会重新执行render函数，导致没有重新渲染。
 
-```react
+```tsx
 import { useState } from 'react'
 
 function MyButton() {
@@ -96,7 +96,7 @@ function App() {
 
 ## 2. useEffect
 
-```react
+```tsx
 import {useEffect} from 'react'
 ```
 
@@ -476,7 +476,7 @@ useLayoutEffect 和 useEffect 非常相似，它们仅有的区别为：
 
 ### 1. Context 共享
 
-```react
+```tsx
 const useUserToken = () => {
   const user = useContext(UserContext)
   const token = useContext(TokenContext)
@@ -489,7 +489,7 @@ const useUserToken = () => {
 
 ### 2. 获取 document 滚动高度
 
-```react
+```tsx
 import {useState} from 'react'
 
 function useScrollPosition() {

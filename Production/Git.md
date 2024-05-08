@@ -14,6 +14,18 @@ git branch
 git branch -a
 ```
 
+查看远程分支
+
+```bash
+git branch -r
+```
+
+查看本地分支
+
+```bash
+git branch -v
+```
+
 关联远程分支
 
 ```bash

@@ -1,8 +1,8 @@
 import { version } from '../package.json'
 
-export const title = 'Docs'
-export const description = 'A VitePress Site'
+export const title = "Liclo's Docs"
+export const description = 'Frontend Learning'
 
-export const github = 'https://github.com/dekki'
+export const github = 'https://github.com/lin0learning'
 
 export const docsVersion = version

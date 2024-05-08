@@ -4,6 +4,8 @@ import sidebar from './sidebar.ts'
 import socialLinks from './links.ts'
 
 export default defineConfig({
+  base: '/liclo-docs/',
+
   title,
   description,
 

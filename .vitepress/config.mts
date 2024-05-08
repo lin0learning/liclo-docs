@@ -56,5 +56,8 @@ export default defineConfig({
     ],
     sidebar,
     socialLinks
-  }
+  },
+  head: [
+    ['link', { rel: 'icon', type: 'image/x-icon', href: '/liclo-docs/favicon.ico' }]
+  ]
 })

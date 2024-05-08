@@ -1,10 +1,16 @@
 ---
 layout: home
 
+title: Liclo's Docs
+titleTemplate: Frontend Learning
+
 hero:
-  name: "Docs"
-  text: "VitePress Site"
-  tagline: project tagline
+  name: Liclo's Docs
+  text: Frontend Learning
+  tagline: 👋 欲买桂花同载酒，终不似，少年游
+  image:
+    src: /clean_up.svg
+    alt: Liclo's Docs
   actions:
     - theme: brand
       text: 开始阅读

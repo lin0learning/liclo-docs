@@ -4,7 +4,7 @@
 
 通过调用 `render` 函数，可以在浏览器的 DOM 元素中展示 React 组件。
 
-```react
+```tsx
 import { render } from 'react-dom'
 import App from './app.js'
 
@@ -17,7 +17,7 @@ render(<App/>, root)
 
 调用 `createRoot` 以在浏览器 DOM 元素中创建根节点显示内容：
 
-```react
+```tsx
 import { createRoot } from 'react-dom/client'
 import App from './app.js'
 

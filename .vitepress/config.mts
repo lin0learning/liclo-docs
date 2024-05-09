@@ -4,6 +4,8 @@ import sidebar from './sidebar.ts'
 import socialLinks from './links.ts'
 
 export default defineConfig({
+  base: '/liclo-docs/',
+
   title,
   description,
 
@@ -54,5 +56,8 @@ export default defineConfig({
     ],
     sidebar,
     socialLinks
-  }
+  },
+  head: [
+    ['link', { rel: 'icon', type: 'image/x-icon', href: '/liclo-docs/favicon.ico' }]
+  ]
 })

@@ -1129,6 +1129,27 @@ function getFirstDayOfWeek(year: number, month: number) {
 ```
 
 
+## 28. 对象的迭代
+
+对对象添加迭代器属性即可使用 `for of` 方法遍历对象，对象的 `key` 必须为number，并且索引从数值 `0` 开始，且必须添加 `length` 属性：
+```typescript
+let obj = {
+  0: 'a',
+  1: 'b',
+  2: 'c',
+  length: 3,
+  [Symbol.iterator]: Array.prototype[Symbol.iterator]
+}
+
+for (let item of obj) {
+  console.log(item)  // 'a' 'b' 'c'
+}
+
+for (let key in obj) {
+  console.log(key)  // '0' '1' '2' 'length'
+}
+```
+
 
 
 

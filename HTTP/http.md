@@ -362,6 +362,7 @@ Access-Control-Request-Headers: X-PRODUCT
 8. **405**： Not Allowed (nginx)请求的静态文件采用的是post方法，nginx是不允许post访问静态资源
 9. **429**：太多请求，get方法。detail为`Too many requests in 1 hour. Try again later. You have being rate limited`.
 10. **503**：服务不可访问，比如上传图片链接，采用POST请求等出现跨域
+11. **426**: `Upgrade Required`。一种错误状态码，表示服务器拒绝处理客户端使用当前协议发送的请求，但是可以接受其使用升级后的协议发送的请求。
 
 
 

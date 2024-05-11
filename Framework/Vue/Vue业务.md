@@ -1,6 +1,10 @@
-### 1. Vue组件内嵌套外部页面的视线与案例分享
+# Vue 业务实践
 
-#### 1. 前言
+
+
+## 1. Vue组件内嵌套外部页面的视线与案例分享
+
+### 1. 前言
 
 > 在 web 页面开发中，常常会有这样需求：
 >
@@ -10,7 +14,7 @@
 
 
 
-#### 2. 解决方案
+### 2. 解决方案
 
 使用 **iframe** 加载外部页面。
 
@@ -24,7 +28,7 @@ html 页面内嵌套 iframe，并将 iframe 的 src 属性绑定为目标外部�
 
 
 
-#### 3. 示例
+### 3. 示例
 
 **需求：** 点击电商导航内菜单，打开相应页面，在新开页面中，显示页面加载状态，可以回退和直接关闭新开页面。
 
@@ -43,12 +47,13 @@ html 页面内嵌套 iframe，并将 iframe 的 src 属性绑定为目标外部�
  <div class="module-box">
     <div class="module-title">电商导航</div>
     <van-grid :column-num="3">
-        <van-grid-item v-for="(item,index) in eShopNavItems"
-                         :key="index"
-                         :icon="item.iconPath"
-                         :text="item.name"
-                         @click="gotoPage(item.path)" />
-     </van-grid>
+      <van-grid-item v-for="(item,index) in eShopNavItems"
+        :key="index"
+        :icon="item.iconPath"
+        :text="item.name"
+        @click="gotoPage(item.path)"
+      />
+    </van-grid>
  </div>
 </template>
 ```
@@ -63,16 +68,16 @@ js逻辑部分：
   const router = useRouter();
   const route = useRoute();
   const eShopNavItems = [
-      {
-          name: "京东",
-          iconPath: require('@/assets/images/lifeServices/index/jd.png'),
-          path: '/home/lifeServices/jd'
-      }
+    {
+      name: "京东",
+      iconPath: require('@/assets/images/lifeServices/index/jd.png'),
+      path: '/home/lifeServices/jd'
+    }
   ]
   const goJDPage = (path) => {
-      router.push(path);
-      store.state.iframeSrc = route.meta.link;
-      store.state.iframeTitle = route.meta.title;
+    router.push(path);
+    store.state.iframeSrc = route.meta.link;
+    store.state.iframeTitle = route.meta.title;
   }
 </script>
 ```
@@ -80,18 +85,21 @@ js逻辑部分：
 路由配置：
 
 ```js
-const routes = [{
-  path: '/home/lifeServices/externalLink',
-  name: 'externalLink',
-  component: LinkHome,
-  children: [
-    {
-      path: '/home/lifeServices/jd',
-      meta: {
-        link: 'https://m.jd.com/',
-        title: '京东(jd.com)'
-      }
-    },
+const routes = [
+  {
+    path: '/home/lifeServices/externalLink',
+    name: 'externalLink',
+    component: LinkHome,
+    children: [
+      {
+        path: '/home/lifeServices/jd',
+        meta: {
+          link: 'https://m.jd.com/',
+          title: '京东(jd.com)'
+        }
+      },
+    ]
+  }
 ];
 ```
 
@@ -170,7 +178,7 @@ iframe.onload = function() {
 
 
 
-### 2. `el-pagination` 前端分页
+## 2. `el-pagination` 前端分页
 
 ```vue
 <template>
@@ -214,7 +222,7 @@ iframe.onload = function() {
 
 
 
-### 3. Vue 设置全局属性
+## 3. Vue 设置全局属性
 
 1. `Provide` / `Inject`
 
@@ -252,23 +260,21 @@ app.config.globalProperties.myName = "globalName"
 </template>
 ```
 
-在`<script>`中使用：
+在`<script setup>`中使用：
 
 ```js
-<script setup>
 import { getCurrentInstance } from "vue"
   
 const { proxt } = getCurrentInstance()
 
 console.log(proxy.message)
-</script>
 ```
 
 
 
-### 4. a-table 行点击事件
+## 4. a-table 行点击事件
 
-Ant Design Vue - 表格 ＜a-table＞ 组件绑定行点击事件（点击表格行事件）。
+Ant Design Vue - 表格 `<a-table>` 组件绑定行点击事件（点击表格行事件）。
 
 > Ant Design Vue customRow
 
@@ -294,7 +300,7 @@ export default {
 
 
 
-### 5. tooltip实现
+## 5. tooltip实现
 
 使用 `@mousenter` 和 `@mouseleave` 事件
 
@@ -344,7 +350,7 @@ const hoverSty = {
 
 
 
-### 6. Ant-design-vue darkmode
+## 6. Ant-design-vue darkmode
 
 ```js
 // webpack.config.js
@@ -374,7 +380,7 @@ module.exports = {
 
 
 
-### 7. router-link 样式修改
+## 7. router-link 样式修改
 
 router-link默认样式为蓝色，它的背后是a标签，设置样式时推荐设置它的父元素下的a标签，然后设置样式。
 
@@ -396,7 +402,7 @@ router-link默认样式为蓝色，它的背后是a标签，设置样式时推�
 
 
 
-### 8. a-table rowKey
+## 8. a-table rowKey
 
 ant design vue 的table三种加 rowKey 的方式
 
@@ -415,7 +421,7 @@ ant design vue 的table三种加 rowKey 的方式
 
 
 
-### 9. Echarts 点击事件
+## 9. Echarts 点击事件
 
 Echarts 柱状图监听点击事件的实现方法。
 
@@ -465,7 +471,7 @@ this.chart.on('click', params => {
 
 
 
-### 10. 重置路由
+## 10. 重置路由
 
 后台管理系统当用户退出登录时，如果页面没有刷新，动态路由的配置依然存在。重置路由的方法：
 
@@ -489,7 +495,7 @@ export function resetRouter() {
 
 
 
-### 11. resize 指令
+## 11. resize 指令
 
 ```vue
 <template>
@@ -547,7 +553,7 @@ export default {
 
 
 
-### 12. Vue-simple-uploader
+## 12. Vue-simple-uploader
 
 ```vue
 <template>
@@ -592,7 +598,7 @@ const options = {
 
 
 
-### 13. 声明全局组件/属性类型
+## 13. 声明全局组件/属性类型
 
 **声明全局组件类型**
 
@@ -644,7 +650,7 @@ export {} // 被识别为 TS模块，正常工作；若没有顶级 `import` 或
 
 
 
-### 14. JSX/TSX 支持
+## 14. JSX/TSX 支持
 
 Vite 环境需安装 `@vitejs/plugin-vue-jsx`
 
@@ -666,3 +672,73 @@ export default defineConfig({
 })
 ```
 
+
+
+
+
+## 15. 自定义 Vue3 hooks
+
+**1）更改网站 title**
+
+```typescript [useTitle.ts]
+import { reef, watchEffect, onUnmounted } from 'vue'
+
+export function useTitle(title: string, restoreOnUnMount = true) {
+  const cache = document.title
+  const titleRef = ref(title)
+  
+  watchEffect(() => {
+    document.title = titleRef.value
+  })
+  
+  if (restoreOnUnMount) {
+    onUnmounted(() => {
+      document.title = cache
+    })
+  }
+  
+  const setTitle = (title: string) => {
+    titleRef.value = title
+  }
+  return setTitle
+}
+```
+
+组件中使用：
+
+```ts
+import {useTitle} from './xxx'
+
+const setTitle = useTitle('custom title')
+```
+
+
+
+**2）分页器**
+
+```ts [usePagination.ts]
+import { reactive } from 'vue'
+
+export function usePagination(
+	total: number = 0,
+  current: number = 1,
+  pagiSize: number = 10
+  pageSizeOptions: string[] = ["10", "20", "30", "40"],
+  const pagination = reactive({
+    total,
+    current,
+    pageSize,
+    pageSizeOptions,
+    showTotal: () => `共${pagination.total}条`,
+    showSizeChanger: true,
+    onChange(page, pageSize) {
+      pagination.current = page;
+      pagination.pageSize = pageSize;
+    },
+  })
+  return pagination
+)
+
+// 使用
+const pagination = usePagination()
+```

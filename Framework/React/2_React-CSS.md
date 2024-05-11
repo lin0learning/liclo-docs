@@ -141,68 +141,68 @@ export default {
 import styled from 'styled-components'
 
 const MyButton = styled.button`
-	padding: 8px 30px;
-	border-radius: 5px;
-	&:hover {
-		transform: scale(1.05);
-	}
-	.second_text {
-		background-color: cyan;
-		color: black;
-	}
+  padding: 8px 30px;
+  border-radius: 5px;
+  &:hover {
+    transform: scale(1.05);
+  }
+  .second_text {
+    background-color: cyan;
+    color: black;
+  }
 `
 const WarnButton = styled(MyButton)`
-	background-color: red;
-	color: #fff;
+  background-color: red;
+  color: #fff;
 `
 
 // app.tsx
 import {MyButton} from './style'
-const App = () => {
-  return (
-  	<>
-    	<Title type='submit'>The styled component</Title>
-      <Title as='a' href='#'>
-				This is <span className='second_text'>styled component</span>
-      </Title>
-    </>
-  )
-}
+const App = () => (
+  <>
+    <Title type='submit'>The styled component</Title>
+    <Title as='a' href='#'>
+      This is <span className='second_text'>styled component</span>
+    </Title>
+  </>
+)
 ```
 
-`styled-components`提供`ThemeProvider`组件，可以再`theme` prop中传入对象，在所包裹的组件中可以获取：
+`styled-components` 提供 `<ThemeProvider>`组件来支持主题模式，底层原理为 React 的 `context` API，可以添加 `theme` prop 属性并添加属性值，在被 `<ThemeProvider>` 所包裹的组件，不管组件的层级有多深，都可以通过 `props` 访问到 `theme`：
 
-```tsx
+:::code-group
+
+```tsx{6,8} [App.tsx]
 // App.tsx
 import {ThemeProvider} from 'styled-components'
 import theme from '../'
 
 root.render(
-	<ThemeProvider theme={theme}>
-  	<App/>
+  <ThemeProvider theme={theme}>
+    <App/>
   </ThemeProvider>
 )
 ```
 
-```ts
+```ts [theme.ts]
 // theme.ts
 const theme = {
   color: {
-     pimaryColor: '#ff385c',
+    pimaryColor: '#ff385c',
     secondaryColor: '#00848a'
   }
 }
 ```
 
-```ts
+```ts{5} [Children.ts]
 // 后代组件样式
 import styled from 'styled-components'
 
 const HeaderWrapper = styled.css`
-	color: ${props => props.theme.color.primaryColor}
+  color: ${props => props.theme.color.primaryColor}
 `
 ```
-
+:::
 
 
 
@@ -249,7 +249,7 @@ const App = () => {
 
 ```tsx
 <HomeWrapper>
-	<div class='content'>
+  <div class='content'>
     <div class='section'>
       <div class='title'></div>
       <div class='content'></div>
@@ -261,10 +261,10 @@ const App = () => {
 ```typescript
 // 任何 css in js
 const HomeWrapper = styled.div`
-	> .content {
-		width: 1032px;
-		margin: 0 auto;
-	}
+  > .content {
+    width: 1032px;
+    margin: 0 auto;
+  }
 `
 ```
 
@@ -300,13 +300,10 @@ const App = () => {
 ## 7. CSS 预处理器
 
 ### sass
-
+待完善...
 
 
 ### less
+待完善...
 
 
-
-
-
-codercba.com:1888/airbnb/api/home/goodprice

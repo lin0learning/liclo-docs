@@ -257,21 +257,23 @@ const double = computed<number>(() => {})
 类型声明 + 类型断言
 
 ```vue
+<template>
+  <input type='text' @change='handleChange' />
+</template>
+
 <script setup lang='ts'>
 function handleChange(e: Event) {
   console.log((e.target as HTMLInputElement).value)
 }
 </script>
-<template>
-	<input type='text' @change='handleChange' />
-</template>
+
 ```
 
 
 
 ### 7. provide / inject
 
-provide 和 inject 通常会在不同的组件中运行。Vue 提供了一个 `InjectionKey` 接口，它是一个继承自 `Symbol` 的泛型类型，可以用来在提供者和消费者之间<font color="red">同步注入值的类型</font>：
+provide 和 inject 通常会在不同的组件中运行。Vue 提供了一个 `InjectionKey` 接口，它是一个继承自 `Symbol` 的泛型类型，可以用来在提供者和消费者之间<text style="color: red;">同步注入值的类型</text>：
 
 ```typescript
 import {provide, inject} from 'vue'
@@ -289,29 +291,28 @@ const foo = inject(key)
 ### 8. 模板引用（DOM）
 
 ```vue
+<template>
+  <input ref="el" />
+</template>
+
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import {ref, onMounted} from 'vue'
 
 const el = ref<HMTLInputElement | null>(null)
 
 onMounted(() => {
   el.value?.focus()
 })
-
 </script>
-
-<template>
-	<input ref="el" />
-</template>
 ```
 
 
 
 ### 9. 组件模板引用
 
-举例，一个 `MyModal` 子组件，它有一个打开模态框的方法：
+举例，一个 `MyModal` 子组件，它定义并向外暴露了打开模态框的方法：
 
-```vue
+```vue {6,8}
 <!-- MyModal.vue -->
 <script setup lang='ts'>
 import {ref} from 'vue'
@@ -319,9 +320,7 @@ import {ref} from 'vue'
 const isContentShown = ref(false)
 const open = () => (isContentShown.value = true)
 
-defineExpose({
-  open
-})
+defineExpose({ open })
 </script>
 ```
 
@@ -332,8 +331,7 @@ defineExpose({
 <script setup lang='ts'>
 import MyModal from './MyModal.vue'
 
-const modal = ref<InstanceType<typeof MyModal> | null>(null)
-
+const modal = ref<InstanceType<typeof MyModal> | null>(null)  // [!code focus:4]
 const openModal = () => {
   modal.value?.open()
 }
@@ -347,7 +345,7 @@ const openModal = () => {
 
 ### defineExpose
 
-向外暴露的时候变量会自动解包，比如上面子组件的 `name:Ref<string>` 暴露到父组件的时候自动变成了`name:string`
+向外暴露的时候变量会自动解包，比如下面子组件的 `name:Ref<string>` 暴露到父组件的时候自动变成了`name:string`
 
 ```vue
 <script setup>
@@ -408,7 +406,7 @@ Vue 3.4 版本之前的实现：
 
 ```vue
 <template>
-	<input :value="props.modelValue" @input="emit('update:modelValue', $event.target.value)" />
+  <input :value="props.modelValue" @input="emit('update:modelValue', $event.target.value)" />
 </template>
 
 <script setup lang='ts'>
@@ -484,7 +482,7 @@ import { defineComponent } from 'vue
 export default defineComponent({
   components: { SmileOutlined, DownOutlined }
   setup() {
-		return {}
+	  return {}
   }
 })
 </script>
@@ -622,7 +620,7 @@ let post =  {
 
 ```vue
 <template>
-	<el-table>
+  <el-table>
   	<el-table-column #default="{row, column, $index}">
       <!-- 方式一 -->
       <el-switch :before-change="beforeChange.bind(obj, row)" />

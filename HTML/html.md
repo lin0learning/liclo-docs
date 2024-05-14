@@ -8,16 +8,16 @@
 
 ```html
 <script type="importmap">
-	{
-		"imports": {
-			"vue": "https://unpkg.com/vue@3/dist/vue.esm-browser.js",
-			"vue": "./node_modules/vue/dist/dist/vue.esm-browser.js"
-		}
-	}
+{
+  "imports": {
+    "vue": "https://unpkg.com/vue@3/dist/vue.esm-browser.js",
+    "vue": "./node_modules/vue/dist/dist/vue.esm-browser.js"
+  }
+}
 </script>
 <script type="module">
-  //	import {createApp} from 'vue'
-  // 并发加载
+  //  import {createApp} from 'vue'
+  //  并发加载
   Promise.all([import("vue"), import('vue-router')]).then(() => {})
 </script>
 ```
@@ -33,8 +33,8 @@
 ```html
 <div data-desc="DivElement" data-tip="Template" id="template">Template</div>
 <script>
-	const template = document.getElementById("template")
-	template.dataset // DOMStringMap {desc: 'DivElement', tip: 'Template'}
+  const template = document.getElementById("template")
+  template.dataset // DOMStringMap {desc: 'DivElement', tip: 'Template'}
 </script>
 ```
 
@@ -67,8 +67,9 @@ data-app-id >>> appId
 <div class="out">
   <div class="inner"></div>
 </div>
+
 <script>
-	let out = document.getElementsByClassName('out')[0];
+  let out = document.getElementsByClassName('out')[0];
   let inner = document.getElementsByClassName('inner')[0];
   out.addEventListener('click', (e) => {
     console.log('out');
@@ -91,7 +92,7 @@ data-app-id >>> appId
 ```html
 <img alt="xxx" src="xxx" onerror="handleError" />
 <script>
-	function handleError() {
+  function handleError() {
     // 图片加载失败时调用
   }
 </script>
@@ -198,7 +199,6 @@ channel.postMessage('logout')
 
 // 接收消息（监听）
 channel.addEventListener('message', channelEvent)
-
 function channelEvent(e: MessageEvent<any>) {
   const { data } = e
   // ...
@@ -403,3 +403,8 @@ context.addEventListener('click', (e) => {
 ```
 
 :::
+
+
+## 16. 阻止默认行为 & 阻止冒泡
+- `event.preventDefault()`: 阻止默认行为
+- `event.stopPropagation()`: 阻止事件冒泡

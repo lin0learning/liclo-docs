@@ -3,16 +3,16 @@ import type { DefaultTheme } from 'vitepress'
 const sidebar: DefaultTheme.Sidebar | undefined = {
   '/': [
     {
-      text: '开始阅读',
+      text: '👋 开始阅读',
       items: [
-        { text: '👋 Guide', link: '/guide' },
+        { text: ' Guide', link: '/guide' },
         { text: 'HTML', link: '/HTML/html' },
         { text: '样式&布局', link: '/CSS/样式&布局' },
         { text: 'JavaScript', link: '/JavaScript/JavaScript' },
       ]
     },
     {
-      text: '框架',
+      text: '✨ 框架',
       collapsed: false,
       items: [
         { text: 'Vue', link: '/Framework/Vue/Vue' },
@@ -21,7 +21,7 @@ const sidebar: DefaultTheme.Sidebar | undefined = {
       ]
     },
     {
-      text: '工程化',
+      text: '🎉 工程化',
       collapsed: false,
       items: [
         { text: 'Git', link: '/Production/Git' },

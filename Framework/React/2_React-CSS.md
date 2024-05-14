@@ -172,7 +172,7 @@ const App = () => (
 
 :::code-group
 
-```tsx{6,8} [App.tsx]
+```tsx {6,8} [App.tsx]
 // App.tsx
 import {ThemeProvider} from 'styled-components'
 import theme from '../'
@@ -194,7 +194,7 @@ const theme = {
 }
 ```
 
-```ts{5} [Children.ts]
+```typescript {5} [Children.ts]
 // 后代组件样式
 import styled from 'styled-components'
 
@@ -206,7 +206,35 @@ const HeaderWrapper = styled.css`
 
 
 
+**创建带有 props 的样式组件**
 
+```typescript
+import styled from 'styled-components'
+
+interface ButtonProps {
+  color: string
+  size: 'small' | 'medium' | 'large'
+}
+
+const Button = styled.button<ButtonProps>`
+  color: ${props => props.color };
+  font-size: ${props => {
+    switch (props.size) {
+      case 'small':
+        return '12px'
+        break
+      case 'medium':
+        return '16px'
+        break
+      case 'large':
+        return '20px'
+        break
+      default:
+        return '16px'
+    }
+  }}
+`
+```
 
 
 
@@ -305,5 +333,4 @@ const App = () => {
 
 ### less
 待完善...
-
 

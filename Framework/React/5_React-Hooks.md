@@ -154,6 +154,37 @@ const FullScreenModal = memo((props: any) => {
 })
 ```
 
+**应用三**
+
+
+:::code-group
+```ts [useScrollTop.ts]
+import { useEffect } from 'react'
+import { useLocation } from 'react-router-dom'
+
+export function useScrollTop() {
+  const location = useLocation()
+  // 切换页面时滚动到页面顶部
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [location.pathname])
+}
+```
+
+```tsx [App.tsx]
+import {useScrollTop} from '../hooks/useScrollTop.ts'
+
+const App = () => {
+  useScrollTop()
+
+  return (
+    <!-- ... -->
+  )
+}
+
+```
+:::
+
 
 ## 3. Context/Reducer
 

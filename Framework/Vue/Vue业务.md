@@ -41,8 +41,8 @@ html 页面内嵌套 iframe，并将 iframe 的 src 属性绑定为目标外部�
 
 
 图一页面布局：
-
-```vue
+:::code-group
+```vue [template]
 <template>
  <div class="module-box">
     <div class="module-title">电商导航</div>
@@ -57,30 +57,28 @@ html 页面内嵌套 iframe，并将 iframe 的 src 属性绑定为目标外部�
  </div>
 </template>
 ```
-
-js逻辑部分：
-
-```vue
+```vue [script]
 <script setup>
-  import { useRouter,useRoute } from 'vue-router'
-  import store from '@/store/index'
-    
-  const router = useRouter();
-  const route = useRoute();
-  const eShopNavItems = [
-    {
-      name: "京东",
-      iconPath: require('@/assets/images/lifeServices/index/jd.png'),
-      path: '/home/lifeServices/jd'
-    }
-  ]
-  const goJDPage = (path) => {
-    router.push(path);
-    store.state.iframeSrc = route.meta.link;
-    store.state.iframeTitle = route.meta.title;
+import { useRouter,useRoute } from 'vue-router'
+import store from '@/store/index'
+  
+const router = useRouter();
+const route = useRoute();
+const eShopNavItems = [
+  {
+    name: "京东",
+    iconPath: require('@/assets/images/lifeServices/index/jd.png'),
+    path: '/home/lifeServices/jd'
   }
+]
+const goJDPage = (path) => {
+  router.push(path);
+  store.state.iframeSrc = route.meta.link;
+  store.state.iframeTitle = route.meta.title;
+}
 </script>
 ```
+:::
 
 路由配置：
 
@@ -124,7 +122,8 @@ const routes = [
     </div>
   </div>
 </template>
-<script>
+
+<script setup>
 import { useRouter } from 'vue-router';
 import state from '@/store/index';
 import NProgress from 'nprogress';
@@ -133,15 +132,15 @@ const router = useRouter();
 let iframe = document.getElementById('iframe-container');
 NProgress.start()
 iframe.onload = function() {
-    NProgress.done()
+  NProgress.done()
 }
 const onClickLeft = () => {
-    router.go(-1)
-    NProgress.done()
+  router.go(-1)
+  NProgress.done()
 }
 const closeTab = () => {
-    router.replace('home/lifeServices/index')
-    NProgress.done()
+  router.replace('home/lifeServices/index')
+  NProgress.done()
 }
 </script>
 ```
@@ -158,7 +157,7 @@ NProgress.start()
 
 获取 iframe 元素，当 iframe 页面加载完成后，关闭进度条。
 
-```stylus
+```js
 iframe.onload = function() {
   NProgress.done()
 }
@@ -182,39 +181,40 @@ iframe.onload = function() {
 
 ```vue
 <template>
-	<el-pagination
-  	:total="total"
+  <el-pagination
+    :total="total"
     :page-sizes="[10, 20, 30, 40]"
     :page-size="pageSize"
     :current-page="currentPage"
     @current-change="handleCurrentChange"
   />
 </template>
+
 <script setup>
-	const allData = ref([]);     // 后端一次性传来的所有数据
-  const pagedData = ref([]);   // 当前页显示的数据
-  const currentPage = ref(1);  // 当前页数
-  const pageSize = ref(10);    // 每页显示条数
-  const total = ref(0);        // 总条数
-  
-  const handleCurrentChange = (val) => {
-    currentPage.value = val;
-    updatePagedData();
-  };
-  
-  const getData = () => {
-    // 向后端请求数据，然后更新 allData.value 和 total.value
-    // 示例：假设后端返回的数据是一个数组
-    allData.value = [...res]; // 更新为实际的数据
-    total.value = allData.value.length;
-    updatePagedData();
-	};
-  // 关键函数，对数据进行虚拟分段
-  const updatePagedData = () => {
-    const startIndex = (currentPage.value - 1) * pageSize.value;
-    const endIndex = startIndex + pageSize.value;
-    pagedData.value = allData.value.slice(startIndex, endIndex);
-  };
+const allData = ref([]);     // 后端一次性传来的所有数据
+const pagedData = ref([]);   // 当前页显示的数据
+const currentPage = ref(1);  // 当前页数
+const pageSize = ref(10);    // 每页显示条数
+const total = ref(0);        // 总条数
+
+const handleCurrentChange = (val) => {
+  currentPage.value = val;
+  updatePagedData();
+};
+
+const getData = () => {
+  // 向后端请求数据，然后更新 allData.value 和 total.value
+  // 示例：假设后端返回的数据是一个数组
+  allData.value = [...res]; // 更新为实际的数据
+  total.value = allData.value.length;
+  updatePagedData();
+};
+// 关键函数，对数据进行虚拟分段
+const updatePagedData = () => {
+  const startIndex = (currentPage.value - 1) * pageSize.value;
+  const endIndex = startIndex + pageSize.value;
+  pagedData.value = allData.value.slice(startIndex, endIndex);
+};
 </script>
 ```
 
@@ -256,7 +256,7 @@ app.config.globalProperties.myName = "globalName"
 
 ```vue
 <template>
-	<p>{{ myName }}</p>
+  <p>{{ myName }}</p>
 </template>
 ```
 
@@ -266,7 +266,6 @@ app.config.globalProperties.myName = "globalName"
 import { getCurrentInstance } from "vue"
   
 const { proxt } = getCurrentInstance()
-
 console.log(proxy.message)
 ```
 
@@ -280,18 +279,14 @@ Ant Design Vue - 表格 `<a-table>` 组件绑定行点击事件（点击表格�
 
 ```vue
 <template>
-	<a-table :customow="rowClick"></a-table>
+  <a-table :customow="rowClick"></a-table>
 </template>
-<script>
-export default {
-  methods: {
-    rowClick: function (recor, index) {
-      return {
-        on: {
-          click: () => {}, // 单击
-          dblclick: () => {} // 双击
-        }
-      }
+<script setup>
+function rowClick(record, index) {
+  return {
+    on: {
+      click: () => {}   // single click
+      dbclick: () => {} // double click
     }
   }
 }
@@ -306,10 +301,11 @@ export default {
 
 ```vue
 <template>
-	<div @mouseenter="showDetail" @mouseleave="hideDetail">
-    <slot></slot>
-  </div>
+<div @mouseenter="showDetail" @mouseleave="hideDetail">
+  <slot></slot>
+</div>
 </template>
+
 <script setup>
 import { reactive, ref } from "vue";
 const hoverRef = ref(null);
@@ -361,18 +357,18 @@ module.exports = {
     test: /\.less$/,
     use: [{
       loader: 'style-loader',
-    },{
+    }, {
       loader: 'css-loader', // translates CSS into CommonJS
-    },{
+    }, {
       loader: 'less-loader', // compiles Less to CSS
-+     options: {
-+       lessOptions: { // 如果使用less-loader@5，请移除 lessOptions 这一级直接配置选项。
-+         modifyVars: getThemeVariables({
-+           dark: true, // 开启暗黑模式
-+         }),
-+         javascriptEnabled: true,
-+       },
-+     },
+      options: { // [!code ++]
+        lessOptions: { // 如果使用less-loader@5，请移除 lessOptions 这一级直接配置选项。 // [!code ++]
+          modifyVars: getThemeVariables({ // [!code ++]
+            dark: true, // 开启暗黑模式 // [!code ++]
+          }), // [!code ++]
+          javascriptEnabled: true, // [!code ++]
+       },
+      },
     }]
   }]
 }
@@ -404,7 +400,7 @@ router-link默认样式为蓝色，它的背后是a标签，设置样式时推�
 
 ## 8. a-table rowKey
 
-ant design vue 的table三种加 rowKey 的方式
+ant design vue `<table>` 组件三种加 `rowKey` 的方式：
 
 ```vue
 <!-- record的某个属性 -->
@@ -440,7 +436,7 @@ chart.getZr().on('click', params => {
 })
 ```
 
-getZr()方法可以监听到整个画布的点击事件，zIndex是被点击的柱形的index若要实现获取id的效果，则需要拿到series的数组，再通过index拿到对应的数据对象。
+`getZr()` 方法可以监听到整个画布的点击事件，`xIndex` 是被点击的柱形的 index 。若要实现获取 id 的效果，则需要拿到 series 的数组，再通过 index 拿到对应的数据对象。
 
 
 
@@ -453,8 +449,11 @@ echarts绑定点击事件后，如果未对事件进行清除再重置option，�
 3. 第3次click，请求后台3次；
 
 解决办法：
+1. 使用 `off` 方法解除监听
+2. 避免在回调函数中再次注册监听器
+3. 使用一次性事件监听器（`once`）
 
-```js
+```js {7-10}
 this.chart = echarts.init(document.getElementById('chartId'))
 this.chart.clear()
 this.chart.showLoading()
@@ -475,7 +474,7 @@ this.chart.on('click', params => {
 
 后台管理系统当用户退出登录时，如果页面没有刷新，动态路由的配置依然存在。重置路由的方法：
 
-```js
+```js {9,10}
 import router from '@/router/index.js'
 
 const whiteList = ['root', '/', 'login', '404']
@@ -557,7 +556,7 @@ export default {
 
 ```vue
 <template>
-	<uploader
+  <uploader
     :options="options"
     :fileStatus="fileStatusText"
     :autoStart="autoStart"
@@ -600,7 +599,7 @@ const options = {
 
 ## 13. 声明全局组件/属性类型
 
-**声明全局组件类型**
+### 1. 声明全局组件类型
 
 定义全局组件：使用 `GlobalComponents` 类型接口声明类型。该接口是Volar专门为了解决全局组件类型而新增的类型接口：
 
@@ -632,11 +631,11 @@ export {}
 
 
 
-**声明全局属性类型**
+### 2. 声明全局属性类型
 
 某些插件会通过 [`app.config.globalProperties`](https://cn.vuejs.org/api/application.html#app-config-globalproperties) 为所有组件都安装全局可用的属性。比如，`this.$http` 用于请求。Vue 暴露了一个被设计为可以通过 TypeScript 模块扩展来扩展的 `ComponentCustomProperties` 接口：
 
-```ts
+```ts [global.d.ts]
 declare module 'vue' {
   interface ComponentCustomProperties {
     $http: import('axios').AxiosStatic
@@ -644,6 +643,19 @@ declare module 'vue' {
 }
 
 export {} // 被识别为 TS模块，正常工作；若没有顶级 `import` 或 `export`，则它将覆盖原始类型
+```
+
+在 Vue2 版本中，通过对 `Vue.prototype` 添加的全局属性，属性声明方式为：
+```ts [global.d.ts]
+import Vue from 'vue'
+
+declare module 'vue/types/vue' {
+  interface Vue {
+    http: import('axios').AxiosStatic
+    moment: import('moment').Moment
+    // ...
+  }
+}
 ```
 
 
@@ -742,3 +754,83 @@ export function usePagination(
 // 使用
 const pagination = usePagination()
 ```
+
+
+
+
+
+## 16. 模块化 Echarts
+
+:::code-group
+
+```js [echarts.js]
+import * as echarts from 'echarts/core' // echarts 核心模块 
+import { BarChart, PieChart, LineChart } from 'echarts/charts' // 图标（按需导入）
+import {
+  TitleComponent,
+  TooltipComponent,
+  GridComponent,
+  LegendComponent,
+  DatasetComponent,
+  TransformComponent,
+} from 'echarts/components' // 提示框，标题，直角坐标系，数据集，内置数据转换器组件...
+import { LabelLayout, UniversalTransition } from 'echarts/features'  // // 标签自动布局、全局过渡动画
+import { CanvasRenderer } from 'echarts/renderers'  // Canvas 渲染器  | SVGRenderer
+
+echarts.use([
+  BarChart,
+  PieChart,
+  LineChart,
+  TitleComponent,
+  TooltipComponent,
+  GridComponent,
+  LegendComponent,
+  DatasetComponent,
+  TransformComponent,
+  LabelLayout,
+  UniversalTransition,
+  CanvasRenderer,
+])
+
+export default echarts
+```
+
+
+
+```vue [Charts.vue]
+<template>
+  <div class="pie-container">
+    <div id="pie" ref="line"></div>
+  </div>
+</template>
+
+<script setup>
+import { ref, onMounted, onUnmounted } from 'vue'
+import echarts from '@/utils/echarts'
+
+const pie = ref(null)
+let pieChart
+
+function initPie() {
+  let pieOption = {/* echarts option */}
+  pieChart.setOption(pieOption, true)
+}
+
+async function SomeDataRequest() {
+  await //...
+  initPie()
+}
+
+onMounted(() => {
+  pieChart = echarts.init(pie.value)
+  window.addEventListener('resize', pieChart.resize())
+})
+onUnmounted(() => {
+  window.removeEventListener("resize", pieChart.resize())
+})
+</script>
+```
+
+
+
+:::

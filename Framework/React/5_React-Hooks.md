@@ -112,6 +112,7 @@ useEffect(() => {}, [])
 
 useEffect函数的第二个参数接收一个数组，数组元素关联useEffect的重新执行；如果为空数组，则不受其他数据关联，只会在组件首次渲染时执行一次。
 
+**应用一**
 ```tsx
 import React, { memo, useState, useEffect } from 'react'
 
@@ -140,6 +141,49 @@ const Effect = memo(() => {
 export default Effect
 ```
 
+**应用二**
+```tsx
+const FullScreenModal = memo((props: any) => {
+  useEffect(() => {
+    // 全屏模态框打开时，移除浏览器滚动条；关闭时恢复滚动条
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.body.style.overflow = "auto"
+    }
+  }, [])
+})
+```
+
+**应用三**
+
+
+:::code-group
+```ts [useScrollTop.ts]
+import { useEffect } from 'react'
+import { useLocation } from 'react-router-dom'
+
+export function useScrollTop() {
+  const location = useLocation()
+  // 切换页面时滚动到页面顶部
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [location.pathname])
+}
+```
+
+```tsx [App.tsx]
+import {useScrollTop} from '../hooks/useScrollTop.ts'
+
+const App = () => {
+  useScrollTop()
+
+  return (
+    <!-- ... -->
+  )
+}
+
+```
+:::
 
 
 ## 3. Context/Reducer

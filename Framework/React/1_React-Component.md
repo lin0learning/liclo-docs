@@ -10,16 +10,16 @@
 
 ```tsx
 interface Props { 
-    todo: { 
-        text:string 
-        complete:boolean 
-    } 
+  todo: { 
+    text:string 
+    complete:boolean 
+  } 
 }
 const TodoListItem = ({ todo }: Props) => {
-    console.log(todo)
-    return ( 
-    // ... 
-    ); 
+  console.log(todo)
+  return ( 
+  // ... 
+  ); 
 };
 ```
 
@@ -29,15 +29,15 @@ const TodoListItem = ({ todo }: Props) => {
 
 ```tsx
 interface TodoListItemProps { 
-    todo: { 
-        text:string 
-        complete:boolean 
-    } 
+  todo: { 
+    text:string 
+    complete:boolean 
+  } 
 }
 const TodoListItem: React.FC<TodoListItemProps> = ({ todo }) => {
-    return( 
-        // ... 
-    );
+  return( 
+    // ... 
+  );
 };
 ```
 
@@ -186,12 +186,12 @@ class App extends React.Component {
 
 ```tsx
 class App extends Component {
-    shouldComponentUpdate(nextProps: Readonly<{}>, nextState: Readonly<{}>, nextContext: any): boolean {
+  shouldComponentUpdate(nextProps: Readonly<{}>, nextState: Readonly<{}>, nextContext: any): boolean {
     return true
   }
 
   getSnapshotBeforeUpdate(prevProps: Readonly<{}>, prevState: Readonly<{}>) {
-
+    //...
   }
 }
 ```
@@ -236,9 +236,9 @@ class Header extends Component {
   render() {
     const { listData } = this.props
     return (
-    	<div>
+      <div>
         {listData?.map((item, index) => (
-        	<div key={index}>{item}</div>
+          <div key={index}>{item}</div>
         )})}
       </div>
     )
@@ -391,8 +391,8 @@ class Typography extends Component<propsType> {
   render() {
     const { itemType } = this.props
     return (
-    	<div>
-      	<div>作用域插槽：{ itemType ? itemType("h") : undefined }</div>
+      <div>
+        <div>作用域插槽：{ itemType ? itemType("h") : undefined }</div>
       </div>
     )
   }
@@ -415,7 +415,7 @@ const ThemeContext = React.createContext()
 function App() {
   return (
     <div>
-    	<Home />
+      <Home />
       <ThemeContext.Provider value={{color： "red"}}>
         <Header />
       </ThemeContext.Provider>
@@ -474,6 +474,7 @@ const ThemeContext = createContext('light');
 return (
   <Home />
   <ThemeContext.Provider>
+    <!---->
   </ThemeContext.Provider>
 )
 ```

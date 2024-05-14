@@ -280,6 +280,7 @@ data-app-id ---> appId
 
 - 捕获点击事件：`capture-bind:tap` （由外到内）
 - 冒泡点击事件：`bind:tap` （由内到外）
+- 捕获阻止冒泡事件：`catch:tap` （捕获到事件并阻止冒泡）
 
 ```html
 <view capture-bind:tap="view1CaptureTap" bind:tap="view1Tap">

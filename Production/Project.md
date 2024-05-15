@@ -377,4 +377,23 @@ VS Code support  (auto fix)
   ]
 }
 ```
+## antfu/eslint-config
+通过 CLI tool 来设置项目：
+```sh
+npx @antfu/eslint-config@latest
+```
+会在根目录下生成 `eslint.config.js` 文件，并在 `.vscode` 下生成 `extension.json` 文件。
 
+```js [eslint.config.js]
+import antfu from '@antfu/eslint-config'
+
+export default antfu({
+  vue: {
+    overrides: {
+      'vue/block-order': ['error', {
+        order: ['template', 'script', 'style'],
+      }],
+    },
+  },
+})
+```

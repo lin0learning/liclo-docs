@@ -834,3 +834,31 @@ onUnmounted(() => {
 
 
 :::
+
+## 17. 获取组件实例方法
+期望使用 `ref()` 来获取组件实例的同时时，获得其组件实例的属性。
+**封装 `useCompRef`**
+
+```ts [useCompRef.ts]
+import { ref } from 'vue'
+
+export function useCompRef<T extends abstract new (...args: any) => any>(
+  _comp: T
+) {
+  return ref<InstanceType<T>>()
+}
+```
+
+**组件中使用**
+```vue
+<template>
+  <Form ref="formRef"></Form>
+</template>
+
+<script lang="ts" setup>
+import { Form } from 'ant-design-vue'
+import { useCompRef } from '@utils/index'
+
+const formRef = useCompRef(Form)
+</script>
+```

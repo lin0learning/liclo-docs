@@ -66,7 +66,17 @@ git pull
 
 
 
+## Repository not found
 
+在使用 git 拉取 gitlab 项目时出现以下错误信息：Repository not found。
+
+出现此错误是因为本地已经保存过之前项目的权限信息--账号/密码，但是该账号密码对于想要拉取代码的项目权限不匹配，因此需要在拉取代码时添加具有权限的账号密码：
+
+假设项目地址为：`192.168.x.x/xx/xx.git`
+
+方式一：项目路径上加上用户名 `git clone http://username@192.168.x.x/xx/xx.git`，并在后续 git 弹窗中输入帐号密码
+
+方式二：远程地址的时候带上用户名及密码 `git clone http://yourname:password@192.168.x.x/xx/xx.git`
 
 
 

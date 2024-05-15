@@ -59,7 +59,8 @@ const sidebar: DefaultTheme.Sidebar | undefined = {
       text: 'TypeScript',
       items: [
         { text: 'TypeScript Docs', link: '/TypeScript/TypeScript' },
-        { text: 'Decorator', link: '/TypeScript/Decorator' }
+        { text: '装饰器 Decorator', link: '/TypeScript/Decorator' },
+        { text: '发布订阅模式', link: '/TypeScript/Publish-Describe Mode' }
       ]
     }
   ],
@@ -100,7 +101,8 @@ const sidebar: DefaultTheme.Sidebar | undefined = {
       text: 'HTTP',
       items: [
         { text: 'HTTP Docs', link: '/HTTP/http' },
-        { text: '基本请求方式', link: '/HTTP/基本请求方式' }
+        { text: '基本请求方式', link: '/HTTP/基本请求方式' },
+        { text: 'Axios 封装', link: '/HTTP/封装axios' }
       ]
     }
   ]

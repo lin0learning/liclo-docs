@@ -1,4 +1,4 @@
-# React Redux
+# React Redux & Redux Toolkit
 
 ## Redux 上手
 
@@ -215,10 +215,11 @@ Redux Toolkit 是官方推荐的编写 Redux 逻辑的方法。
 npm install @reduxjs/toolkit react-redux
 ```
 
-在`store`文件夹中，创建`store`和各模块的`reducerSlice`，并且可以<font color="red">声明根state的类型</font>：
+在`store`文件夹中，创建`store`和各模块的`reducerSlice`，并且可以<font color="red">声明 rootState 的类型</font>：
 
-```ts
-// index.ts
+:::code-group
+
+```ts [index.ts]
 import {configureStore} from '@reduxjs/toolkit'
 import counterReducer from './features/counter'
 import homeReducer from './features/home'
@@ -245,8 +246,7 @@ export default store
 // 通过 react-redux 提供的 <Provider store={store}>高阶组件对后代组件进行store数据和方法的注入
 ```
 
-```ts
-// /store/features/counter.ts
+```ts [counter.ts]
 import {createSlice} from '@reduxjs/toolkit'
 
 const counterSlice = createSlice({
@@ -265,6 +265,8 @@ export const { addNumber, subNumber } = counterSlice.actions // 通过 dispatch 
 // reducer
 export default counterSlice.reducer
 ```
+
+:::
 
 
 
@@ -349,7 +351,7 @@ const userSlice = createSlice({
 
 
 
-### 实现 connect函数
+### 实现 connect 函数
 
 类组件实现：
 
@@ -796,14 +798,6 @@ const isOn = useSelector((state: RootState) => stat)
 #### 2.useDispatch
 
 
-
-
-
-### React 管理 state
-
-1. 组件中自己的state管理
-2. Context数据的共享
-3. 状态管理包 (Redux)
 
 
 

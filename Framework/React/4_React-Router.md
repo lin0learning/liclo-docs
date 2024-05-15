@@ -81,11 +81,10 @@ BrowserRouter 或 HashRouter，并对`<App />`组件包裹，
 - to属性：用于设置跳转到的路径
 
 ```typescript
-interface LinkProps
-  extends Omit<
-  	React.AnchorHTMLAttributes<HTMLAnchorElement>,
-    "href"
-  > {
+interface LinkProps extends Omit<
+  React.AnchorHTMLAttributes<HTMLAnchorElement>,
+  "href"
+> {
   replace?: boolean
   state?: any
   to: To
@@ -221,7 +220,7 @@ const router = [
 
 ### Router 参数传递
 
-**1. 动态路由的参数**：/detail/:id
+**1. 动态路由的参数**：`/detail/:id`
 
 ```tsx
 <Route path='/detail/:id' element={<Detail/>} />
@@ -246,7 +245,7 @@ export default withRouter
 
 
 
-**2. 查询字符串的参数**：/user?name=xx&age=xx
+**2. 查询字符串的参数**：`/user?name=xx&age=xx`
 
 **方式一**：通过react-router提供的`useLocation()` hook 来获取路由查询字符串参数：
 

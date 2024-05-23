@@ -408,3 +408,18 @@ context.addEventListener('click', (e) => {
 ## 16. 阻止默认行为 & 阻止冒泡
 - `event.preventDefault()`: 阻止默认行为
 - `event.stopPropagation()`: 阻止事件冒泡
+
+
+## 音视频采集 `getUserMedia`
+```js
+const localVideo = ref()
+
+const getLocalStream = async () => {
+  const stream = await navigator.mediaDevices.getUserMedia({
+    audio: true,
+    video: true
+  })
+  localVideo.value.srcObject = stream
+  localVideo.value.play()
+}
+```

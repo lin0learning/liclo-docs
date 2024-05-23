@@ -404,13 +404,13 @@ ant design vue `<table>` 组件三种加 `rowKey` 的方式：
 
 ```vue
 <!-- record的某个属性 -->
-<a-table :rowKey="record => record.id" />
+<a-table :rowKey="record => record.id"></a-table>
 
 <!-- 索引 index -->
-<a-table :rowKey="(record, index) => index" />
+<a-table :rowKey="(record, index) => index"></a-table>
 
 <!-- record的某个属性，这里的rowKey不需要冒号 -->
-<a-table rowKey="id" />
+<a-table rowKey="id"></a-table>
 ```
 
 
@@ -453,14 +453,14 @@ echarts绑定点击事件后，如果未对事件进行清除再重置option，�
 2. 避免在回调函数中再次注册监听器
 3. 使用一次性事件监听器（`once`）
 
-```js {7-10}
+```js
 this.chart = echarts.init(document.getElementById('chartId'))
 this.chart.clear()
 this.chart.showLoading()
 this.chart.setOption(option)
 this.chart.hideLoading()
 this.chart.resize()
-this.chart.off('click')
+this.chart.off('click')  // [!code ++]
 this.chart.on('click', params => {
   // ...
 })
@@ -603,8 +603,7 @@ const options = {
 
 定义全局组件：使用 `GlobalComponents` 类型接口声明类型。该接口是Volar专门为了解决全局组件类型而新增的类型接口：
 
-```ts
-// components.d.ts
+```ts [components.d.ts]
 declare module '@vue/runtime-core' {
   export interface GlobalComponents {
     DemoButton: typeof import('./Button/index.vue')
@@ -615,7 +614,7 @@ declare module '@vue/runtime-core' {
 export {}
 ```
 
-或者扩充模块 `vue` (element-plus库采用方式）：
+或者扩充模块 `vue` （element-plus库采用方式）：
 
 ```ts
 // global.d.ts
@@ -655,6 +654,13 @@ declare module 'vue/types/vue' {
     moment: import('moment').Moment
     // ...
   }
+}
+```
+
+无论是全局组件还是全局属性的类型扩充，`*.d.ts` 都要被 `tsconfig.json` includes：
+```json
+{
+  "include": ["types/*.d.ts"]
 }
 ```
 
@@ -860,5 +866,481 @@ import { Form } from 'ant-design-vue'
 import { useCompRef } from '@utils/index'
 
 const formRef = useCompRef(Form)
+</script>
+```
+
+## 18. 模块自动导入
+`unplugin-auto-import` 插件可用于模块的自动导入，支持 Vite, Webpack, Rspack, Rollup and esbuild.
+通常情况下，我们在Vue 或者 React 开发时，需要导入框架的各个方法：
+```ts
+import {computed, ref} from 'vue'
+
+const count = ref(0)
+const doubled = computed(() => count.value * 2)
+```
+
+在配置了以上插件后，可以不显示的导入 `computed`、`ref` 等方法，在运行时，插件会自动导入。
+以 Vite 为例，配置方法如下：
+1. 安装插件
+```sh
+npm i unplugin-auto-import -D
+```
+2. 使用插件
+```ts [vite.config.ts]
+import AutoImport from 'unplugin-auto-import/vite'
+
+export default defineConfig({
+  plugins: [
+    AutoImport({
+      import: ['vue', 'vue-router', 'pinia'],
+      dirs: ['./src/api'], // 自定义导入路径
+      dts: './types/auto-imports.d.ts' // 导入模块的全局类型声明文件，需添加到`tsconfig.json`中
+    }),
+  ],
+})
+```
+3. ESLint 配置
+   1. Enable `eslintrc.enabled`
+   ```ts [vite.config.ts]
+    AutoImport({
+      eslintrc: {
+        enabled: true
+      }
+    })
+   ```
+
+   2. Update `eslintrc`
+    ```ts [.eslintrc.js]
+    module.exports = {
+      extends: ['./.eslintrc-auto-import.json']
+    }
+    ```
+
+
+
+## 19. Vue JSX 组件及 CSS 方案
+
+以`<Popup>`(Modal) 组件为例，在 Vue 中，JSX组件中没有直接的方式来应用 scoped 样式，但是可以使用 CSS 模块(CSS Modules)或 BEM(Block, Element, Modifier) 命名规范来解决样式冲突问题。
+原始组件及样式：
+:::code-group
+```jsx
+import {ref, defineComponent, Transition} from 'vue';
+import {CloseOutlined} from '@ant-design/icons-vue';
+import './Popup.less';
+
+const Popup = defineComponent({
+  name: 'Popup',
+  props: {
+    title: {
+      type: String,
+      default: ''
+    },
+    width: {
+      type: Number,
+      default: 500
+    },
+    closable: {
+      type: Boolean,
+      default: true
+    },
+    footer: {
+      type: Boolean,
+      default: true
+    },
+    cancelText: {
+      type: String,
+      default: '取消'
+    },
+    confirmText: {
+      type: String,
+      default: '确认'
+    }
+  },
+  emits: ['cancel', 'confirm'],
+  setup(props, {emit, slots, expose}) {
+    const visible = ref(false);
+
+    const show = () => {
+      visible.value = true;
+    };
+    const close = () => {
+      visible.value = false;
+    };
+
+    expose({show, close});
+
+    return () => (
+      <div>
+        {slots.default?.()}
+        <Transition name="popup__fade">
+          {visible.value && (
+            <div class="popup__container">
+              <div class="popup__content-wrapper" style={{width: `${props.width}px`}}>
+                {props.title.length > 0 && (
+                  <div class="popup__header">
+                    <div class="popup__title">{props.title}</div>
+                    {props.closable && <CloseOutlined onClick={close} />}
+                  </div>
+                )}
+                <div class="popup__content">
+                  {slots.content?.()}
+                </div>
+                {props.footer && (
+                  <div class="popup__footer">
+                    <div class="popup__cancel" onClick={() => emit('cancel')}>{props.cancelText}</div>
+                    <div class="popup__confirm" onClick={() => emit('confirm')}>{props.confirmText}</div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </Transition>
+      </div>
+    );
+  }
+});
+
+export default Popup;
+```
+```less
+.container {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 99;
+  background: linear-gradient(
+    90deg,
+    rgba(0, 0, 0, 0.9) 0%,
+    rgba(0, 0, 0, 0.67) 100%
+  );
+  .content-wrapper {
+    background: url("@/assets/images/data-board/popup.png");
+    background-size: cover;
+    position: absolute;
+    left: 50%;
+    top: 40%;
+    transform: translate3d(-50%, -50%, 0);
+    border-radius: 4px;
+    padding: 20px 20px;
+    display: flex;
+    flex-direction: column;
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      .title {
+        width: 100px;
+        font-size: 16px;
+        font-family: PingFangSC-Medium, PingFang SC;
+        font-weight: 500;
+        color: #ffffff;
+        border-bottom: 1px solid #91b0bd;
+        padding-bottom: 10px;
+        position: relative;
+        &:after {
+          width: 30px;
+          height: 3px;
+          position: absolute;
+          background: #4a84d2;
+          bottom: -2px;
+          left: 0;
+          content: "";
+        }
+      }
+    }
+    .content {
+      min-height: 100px;
+    }
+    .footer {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 12;
+      display: flex;
+      justify-content: center;
+      column-gap: 80px;
+      font-size: 16px;
+      color: #fff;
+      font-family: PingFangSC;
+      div {
+        width: 112px;
+        height: 36px;
+        line-height: 36px;
+        text-align: center;
+        cursor: pointer;
+      }
+      .confirm {
+        background: url('@/assets/images/data-board/output-button.png') no-repeat;
+      }
+      .cancel {
+        background: url('@/assets/images/data-board/cancel.png') no-repeat;
+      }
+    }
+  }
+}
+
+.fade-enter-active {
+  animation: to-show 0.3s ease;
+}
+.fade-leave-active {
+  animation: to-hide 0.3s ease;
+}
+@keyframes to-show {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes to-hide {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+```
+:::
+
+### 方法1：使用 CSS Modules
+CSS Modules 可以为 CSS 类生成唯一的标识符，避免样式冲突。确保构建工具配置支持 CSS Modules，以 Vue CLI(webpack) 为例，可以在 `vue.config.js` 中配置：
+```js [vue.config.js]
+module.exports = {
+  css: {
+    loaderOptions: {
+      css: {
+        modules: {
+          localIdentName: '[name]__[local]___[hash:base64:5]',
+        }
+      }
+    }
+  }
+}
+```
+**组件实现**
+假设 CSS 文件名为`Popup.module.less`：
+
+```jsx {Popup.jsx}
+import styles from './Popup.module.less'
+
+export default defineComponent({
+  //...
+  setup(props, { emit, slots, expose }) {
+    //...
+    return () => (
+      <div>
+        {slots.default?.()}
+        <Transition
+          enterActiveClass={UPop['fade-enter-active']}
+          leaveActiveClass={UPop['fade-leave-active']}
+          enterFromClass={UPop['fade-enter-from']}
+          leaveToClass={UPop['fade-leave-to']}
+        >
+          {visible.value && (
+            <div class={styles.container}>
+              {/** ... */}
+            </div>
+          )}
+        </Transition>
+      </div>
+    )
+  }
+})
+```
+
+### 方法2：使用 BEM 命名规范
+
+如果不想配置CSS Modules，可以通过 BEM 命名规范来减少样式冲突。BEM 使用一组命名约定来确保样式的唯一性。
+```less Popup.less
+.u-popup__container {
+  position: fixed;
+  /* 其他样式 */
+}
+.u-popup__content-wrapper {
+  /* 其他样式 */
+}
+/* 其他样式 */
+```
+
+
+
+## 20. 拖拽元素-自定义指令
+
+`vDrag`：指令作用元素或其父元素的 `position` CSS 属性值为 `absolute`时，元素可拖拽。
+
+```js [drag.js]
+import {onUnmounted} from 'vue';
+
+const vDrag = {
+  mounted(el) {
+    const oDiv = el;
+    const minTop = oDiv.getAttribute('drag-min-top');
+    const ifMoveSizeArea  = 20;
+
+    const onMouseDown = (e) => {
+      let target = oDiv;
+      while (window.getComputedStyle(target).position !== 'absolute' && target !== document.body) {
+        target = target.parentElement;
+      }
+      document.onselectstart = () => false;
+
+      if (!target.getAttribute('init_x')) {
+        target.setAttribute('init_x', target.offsetLeft);
+        target.setAttribute('init_y', target.offsetTop);
+      }
+
+      const initX = parseInt(target.getAttribute('init_x'));
+      const initY = parseInt(target.getAttribute('init_y'));
+
+      const disX = e.clientX - target.offsetLeft;
+      const disY = e.clientY - target.offsetTop;
+
+      const onMouseMove = (e) => {
+        // 计算移动的距离
+        const l = e.clientX - disX;
+        const t = e.clientY - disY;
+        // 计算移动当前元素的位置，并且给该元素样式中的left和top值赋值
+        target.style.left = `${l}px`;
+        target.style.top = `${t < minTop ? minTop : t}px`;
+
+        if (Math.abs(l - initX) > ifMoveSizeArea || Math.abs(t - initY) > ifMoveSizeArea) {
+          target.setAttribute('dragged', '');
+        } else {
+          target.removeAttribute('dragged');
+        }
+      };
+
+      const onMouseUp = () => {
+        document.removeEventListener('mousemove', onMouseMove);
+        document.removeEventListener('mouseup', onMouseUp);
+        document.onselectstart = null;
+      };
+
+      document.addEventListener('mousemove', onMouseMove);
+      document.addEventListener('mouseup', onMouseUp);
+
+      return false;
+    };
+
+    oDiv.addEventListener('mousedown', onMouseDown);
+  },
+  unmounted(el) {}
+};
+
+export default vDrag;
+```
+
+**使用方式一：组件内使用**
+
+```vue
+<template>
+  <div v-drag>
+    <!-- -->
+  </div>
+</template>
+
+<script>
+import vDrag from '@/utils/drag.js'
+</script>
+```
+
+
+
+**使用方式二：全局指令挂载**
+
+```js [main.js]
+import {createApp} from 'vue'
+import App from './App.vue'
+import vDrag from '@/utils/drag.js'
+
+const app = createApp(App)
+
+app.directive('drag', vDrag)
+
+app.mount("#app")
+```
+
+
+
+
+
+## 21. `<a-table>` 可编辑行
+
+通过创建 `reactive` 对象记录所点击编辑的行，通过判断该对象是否存在指定表格行实现切换展示与编辑。
+
+```vue
+<template>
+  <a-table>
+    <template #bodyCell="{text, record, column}">
+      <template v-if="column.dataIndex === 'currentTitle'">
+        <div>
+          <a-input v-if="editableData[record.id]" v-model:value="editableData[record.id]['currentTitle']" style="margin: -5px 0;" />
+          <template v-else>{{ text }}</template>
+        </div>
+      </template>
+      <template v-if="column.dataIndex === 'operation'">
+        <span v-if="editableData[record.id]">
+          <a @click="handleSaveTitle(record)">保存</a>
+          <a-popconfirm title="取消保存？" @confirm="handleTitleCancel(record)">
+            <a style="margin-left: 20px;">取消</a>
+          </a-popconfirm>
+        </span>
+        <span v-else>
+          <a @click="handleEditTitle(record)">修改</a>
+        </span>
+      </template>
+    </template>
+  </a-table>
+</template>
+<script>
+const editableData = reactive({});
+const handleEditTitle = (record) => {
+  const {id} = record;
+  editableData[id] = {...customTitles.value.filter(item => item.id === id)[0]};
+};
+const handleSaveTitle = (record) => {
+  const {id} = record;
+  Object.assign(customTitles.value.filter(item => item.id === id)[0], editableData[id]);
+  delete editableData[id];
+};
+const handleTitleCancel = (record) => {
+  const {id} = record;
+  delete editableData[id];
+};
+</script>
+```
+
+
+
+## 22. 动态组件
+使用 Vue 的 `<component>` 元素和 `is` attribute 实现：
+```vue [App.vue]
+<template>
+  <div class="demo">
+    <button
+      v-for="(_, tab) in tabs"
+      :key="tab"
+      :class="['tab-button', {active: currentTab === tab}]"
+      @click="currentTab = tab"
+    >
+      {{ tab }}
+    </button>
+    <component :is="tabs[currentTab]" class="tab"></component>
+  </div>
+</template>
+<script setup>
+import Home from './Home.vue'
+import Posts from './Posts.vue'
+import Archive from './Archive.vue'
+import {ref} from 'vue'
+
+const currentTab = ref('Home')
+const tabs = {Home, Posts, Archive}
 </script>
 ```

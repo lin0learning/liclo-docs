@@ -122,6 +122,21 @@ git rm -r --cached 文件夹 // 保留工作区文件
 
 
 
+## Git 移动/重命名文件、目录 - mv
+
+`git mv`移动或重命名一个文件、目录或软连接。
+
+```sh
+git mv [file] [newfile]
+git mv -v .\SetPopup.vue UPopup.vue
+```
+
+
+
+
+
+
+
 ## Git 分支操作
 
 创建分支

@@ -313,3 +313,9 @@ export default defineConfig({
 ### 生成 `d.ts` 类型文件
 
 借助插件 `vite-plugin-dts`
+
+
+
+
+
+feat：[TypeScript & React](https://www.yuque.com/fechaichai/tsicdr)

@@ -1174,20 +1174,39 @@ export default defineComponent({
 
 `vDrag`：指令作用元素或其父元素的 `position` CSS 属性值为 `absolute`时，元素可拖拽。
 
+**相关功能：**
+1. 绝对定位的父元素：作用于父元素可使整个元素可拖拽，作用于子元素，在子元素范围内可拽拖整个元素；
+2. 指令作用的元素，可设置 `drag-min-top` attribute 距离顶部的最小拽拖距离；
+3. 当拽拖移动的距离超过 `20px` 时，对元素设置`dragged` attribute，可针对该属性设置对应样式；
+4. 当父元素存在类名 'u-popup__content-wrapper-mini' 和 'u-popup__content-wrapper-fullscreen' 其中的一个时，无法拽拖
+
 ```js [drag.js]
 import {onUnmounted} from 'vue';
 
 const vDrag = {
+  /**
+   * @param {Element} el
+   */
   mounted(el) {
-    const oDiv = el;
-    const minTop = oDiv.getAttribute('drag-min-top');
+    let oDiv = el;
+    let minTop = oDiv.getAttribute('drag-min-top');
     const ifMoveSizeArea  = 20;
 
+    while (window.getComputedStyle(oDiv).position !== 'absolute' && oDiv !== document.body) {
+      oDiv = oDiv.parentElement;
+    }
+    minTop = Number(minTop) + Number(oDiv.clientHeight / 2); // 应对绝对定位时的transform: translateY(-50%);
+
+    function handleReturn(target) {
+      let classArray = Array.from(target.classList);
+      let targetClasses = ['u-popup__content-wrapper-mini', 'u-popup__content-wrapper-fullscreen'];
+      if (classArray.some(className => targetClasses.includes(className))) return true;
+    }
+
     const onMouseDown = (e) => {
+      if (handleReturn(oDiv)) return;
+
       let target = oDiv;
-      while (window.getComputedStyle(target).position !== 'absolute' && target !== document.body) {
-        target = target.parentElement;
-      }
       document.onselectstart = () => false;
 
       if (!target.getAttribute('init_x')) {
@@ -1202,6 +1221,8 @@ const vDrag = {
       const disY = e.clientY - target.offsetTop;
 
       const onMouseMove = (e) => {
+        if (handleReturn(oDiv)) return;
+
         // 计算移动的距离
         const l = e.clientX - disX;
         const t = e.clientY - disY;
@@ -1266,8 +1287,18 @@ app.directive('drag', vDrag)
 app.mount("#app")
 ```
 
+**补充：Array.prototype.some()**
+`some()` 方法测试数组中是否至少有一个元素通过了由提供的函数实现的测试。如果在数组中找到一个元素使得提供的函数返回 true，则返回 true；否则返回 false。它不会修改数组。
+举例一：判断数组 `numList: number[]` 所有元素是否都大于0
+```js
+const array1 = [1,2,3,4,5]
+const array2 = [0,1,2,3,4]
 
+const aboveZero = num => num > 0
 
+array1.some(aboveZero)  // true
+array2.some(aboveZero)  // false
+```
 
 
 ## 21. `<a-table>` 可编辑行

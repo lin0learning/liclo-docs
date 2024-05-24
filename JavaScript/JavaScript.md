@@ -1151,6 +1151,39 @@ for (let key in obj) {
 ```
 
 
+## 29. 数组的分段
+实现函数：将长度为 `n` 的数组按照 `splitCount` 进行分段，并返回一个新的数组，新数组的每一项为原数组分段所组成的数组。
+**方法一：`for`**
+```js
+function splitArray(array, splitCount) {
+  const result = []
+  /* 原始 */
+  for (let i = 0; i < Math.ceil(array.length / splitCount); i++) {
+    result.push(array.slice(i * count, (i + 1) * count))
+  }
+
+  /* 改进 */
+  for (let i = 0; i < array.length; i += splitCount) {
+    result.push(array.slice(i, i + splitCount))
+  }
+  return result
+}
+```
+
+**方式二：`reduce`**
+```js
+function splitArray(array, splitCount) {
+  return array.reduce((prev, cur, index) => {
+    const chunkIndex = Math.floor(index / splitCount)
+    if (!prev[chunkIndex]) {
+      prev[chunkIndex] = []
+    }
+    prev[chunkIndex].push(cur)
+    return prev
+  }, [])
+}
+```
+
 
 
 ## 链接

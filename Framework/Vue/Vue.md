@@ -780,7 +780,7 @@ const title = defineModel('title')
 
 
 
-### Transition组件
+### Transition
 
 会在一个元素或组件进入和离开 DOM 时应用动画，由以下条件之一触发：
 
@@ -814,22 +814,22 @@ const title = defineModel('title')
 .fade-leave-active {
 	animation: to-hide 0.3s ease;
 }
-  @keyframes to-show {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 1;
-    }
+@keyframes to-show {
+  from {
+    opacity: 0;
   }
-  @keyframs to-hide {
-    from {
-      opacity: 1;
-    }
-    to {
-      opacity: 0;
-    }
+  to {
+    opacity: 1;
   }
+}
+@keyframes to-hide {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
 </style>
 ```
 
@@ -862,6 +862,24 @@ const title = defineModel('title')
   transform: scale(1.1);
 }
 ```
+
+
+
+
+
+### TransitionGroup
+
+`<TransitionGroup>` 是一个内置组件，用于对 `v-for` 列表中的元素或组件的插入、移除和顺序改变添加动画效果。
+
+**和 `<Transition>` 的区别**
+
+`<TransitionGroup>` 支持和 `<Transition>` 基本相同的 props、CSS 过渡 class 和 JavaScript 钩子监听器，但有以下几点区别：
+
+- 默认情况下，它不会渲染一个容器元素。但你可以通过传入 `tag` prop 来指定一个元素作为容器元素来渲染。
+- 列表中的每个元素都**必须**有一个独一无二的 `key` attribute。
+- CSS 过渡 class 会被应用在列表内的元素上，**而不是**容器元素上。
+
+
 
 
 
@@ -1312,6 +1330,92 @@ export default defineComponent {
         onUpdate:modelValue={(value) => emit("update:modelValue", value)}
       ></SomeComponent>
     )
+  }
+}
+```
+
+
+
+## 透传 Attributes
+
+### Attributes 继承
+
+“透传 attributes”指的是传递给一个组件，却没有被该组件声明为 `props` 或 `emits` 的 attribute 或这 `v-on` 事件监听器。最常见的例子就是 `class` 、`style` 和 `id`。
+
+对于根元素渲染的组件，透传的 attribute 会自动被添加到根元素上。以 `<MyButton>` 组件为例：
+
+```vue
+<MyButton class="btn" style="font-size: 16px;" @click="onClick" />
+```
+
+渲染结果：
+
+```html
+<button class="btn" style="font-size: 16px;" onClick="onClick">click me</button>
+```
+
+
+
+### 禁用 Attributes 继承
+
+```vue
+<script>
+export default {
+  inheritAttrs: false, // Options API
+}
+</script>
+<script setup>
+defineOptions({
+  inheritAttrs: false,  // defineOptions -> Vue3.3+
+})
+</script>
+```
+
+禁用 attribute 继承后可以完全控制 attribute 被如何使用。
+
+这些透传进来的 attribute 可以在模板的表达式中直接用 `$attrs` 访问到。
+
+```vue
+<span>Fallthrough attribute: {{ $attrs }}</span>
+```
+
+或者使用 `v-bind="$attrs"` 应用于指定的 DOM 元素上：
+
+```vue {2}
+<div class="btn-wrapper">
+  <button class="btn" v-bind="$attrs">Click Me</button>
+</div>
+```
+
+
+
+### JS 访问 Attributes
+
+可以在 `<script setup>` 中使用 `useAttrs()` API 来访问一个组件的所有透传 attribute：
+
+```vue
+<script setup>
+import { useAttrs } from 'vue'
+
+const attrs = useAttrs()
+</script>
+```
+
+如果没有使用 `<script setup>`，`attrs` 会作为 `setup()` 上下文对象的一个属性暴露：
+
+:::info 注意
+
+- 这里的 `attrs` 对象总是反映为最新的透传 attribute，但它并不是响应式的 (考虑到性能因素);
+- 不能通过侦听器去监听它的变化。如果需要响应性，可以使用 prop;
+- 或者也可以使用 `onUpdated()` 使得在每次更新时结合最新的 `attrs` 执行副作用。
+
+:::
+
+```js
+export default {
+  setup(props, ctx) {
+    // 透传 attribute 被暴露为 ctx.attrs
+    console.log(ctx.attrs)
   }
 }
 ```

@@ -2,8 +2,10 @@
   "compilerOptions": {
     "target": "ES2020",
     "module": "ESNext",
+    "moduleResolution": "Node",
     "jsx": "preserve",
     "baseUrl": "."
   },
+  "include": [".vitepress/**/*.ts", ".vitepress/components/*.vue"],
   "exclude": ["node_modules"]
 }

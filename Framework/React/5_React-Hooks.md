@@ -185,10 +185,9 @@ const App = () => {
 ```
 :::
 
-
 ## 3. Context/Reducer
 
-#### useContext
+### useContext
 
 在<font color="red">类组件</font>编写中，对组件共享Context的两种方式：
 
@@ -422,7 +421,7 @@ function App() {
 
 
 
-## 6. useImperativeHandle(了解)
+## 6. useImperativeHandle
 
 ```typescript
 function useImperativeHandle<T, R extends T>(
@@ -434,6 +433,8 @@ function useImperativeHandle<T, R extends T>(
 
 案例：
 ```tsx
+import {memo, forwardRef, useRef, useImperativeHandle} from 'react'
+
 type InputRef = {
   click:() => void
   setValue:(params: string) => void
@@ -464,20 +465,23 @@ const App = () => {
   const inputRef = useRef<InputRef>(null)
   
   return <div>
-  	<HelloWorld ref={inputRef} />  {/* 父组件中对子组件中绑定的 ref 为useImperativeHandle 对 ref 进行处理的自定义对象 */}
+  	<HelloWorld ref={inputRef} />
+    {/* 父组件中对子组件中绑定的 ref 为useImperativeHandle 对 ref 进行处理的自定义对象 */}
   </div>
 }
 ```
 
 
 
-### forwardRef（回顾）
+## 7. forwardRef
 
 `React.forwardRef`字面意思理解为转发Ref，它会创建一个React组件，这个组件能够将其接受的 ref 属性转发到其组件树下的另一个组件中。其主要作用是：
 
 **1.转发refs到DOM组件**（ref不像props作为参数可以传递，所以要想传递ref得用forwardRef）
 
 ```tsx
+import React from 'react'
+
 const FancyButton = React.forwardRef((props, ref) => (
 	<button ref={ref} className="FancyButton">
   	{props.children}
@@ -505,7 +509,7 @@ const App = memo(
 
 
 
-## 7. useLayoutEffect
+## 8. useLayoutEffect
 
 > React **不推荐使用** useLayoutEffect
 

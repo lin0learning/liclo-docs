@@ -1048,4 +1048,24 @@ const onEndChange = (date: Dayjs | string) => {
 ```
 
 
+## 条件类型的分发特性避免
 
+当条件类型的形式是泛型时，如果泛型的类型是联合类型，那么它就具有分发特性。比如：
+```ts
+type ToArray<T> = T extends any ? T[] : never
+```
+当我们对 `ToArray` 类型工具传入一个联合类型时，条件类型的判断将会作用于联合类型的每一项：
+```ts
+type ToArray<T> = T extends any ? T[] : never
+
+type StrArr = ToArray<string | number> // type StrArr = string[] | number[]
+```
+以上是条件类型的分发特性（分发条件类型）。
+通常，我们希望这种分发特性。但在特定情况下为了避免这种特性，可以将 `extends` 两边的关键字用方括号括起来：
+```ts {2,5}
+type A<T> = T extends any ? T[] : never
+type B<T> = [T] extends [any] ? T[] : never
+
+type u1 = A<string | number> // type u1 = string[] | number[]
+type u2 = B<string | number> // type u2 = (string | number)[]
+```

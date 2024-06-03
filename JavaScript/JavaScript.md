@@ -810,7 +810,7 @@ String({}) // '[object Object]'
 
 
 
-## 23. JSDoc例
+## 23. JSDoc 文档注释
 
 ```js
 /**
@@ -845,6 +845,28 @@ export function mapMenus(userMenus) {
     return route;
   });
 }
+```
+
+使用 `@typedef` 描述自定义类型，并可在后续复用：
+
+```js
+/**
+ * @typedef {{text: string, id: number, isFinished: boolean}[]} Todos
+*/
+
+/** @type {Todos} */
+const todos = []
+```
+
+使用 `@param` 声明参数类型时，使用中括号可描述可选类型：
+
+```js{4}
+/**
+ * 创建svg tag
+ * @param {'svg'|'g'|'path'|'filter'|'animate'|'marker'|'line'|'polyline'|'rect'|'circle'|'ellipse'|'polygon'} tagName 
+ * @param {import('vue').SVGAttributes} [attrs] 
+ * @returns {Node}
+ */
 ```
 
 
@@ -1184,6 +1206,51 @@ function splitArray(array, splitCount) {
 }
 ```
 
+## 30. 事件回调传递参数
+在使用 `addEventListener` 监听DOM元素的事件时，默认情况下，回调函数只能接收一个 `Event` 对象参数。想在回调函数中传递除了Event对象之外的其他参数，有几种方法：
+方法一：闭包/箭头函数
+```js
+const extraParameter = 'hello world'
+button.addEventListener('click', event => callback(event, extraParameter))
+```
+
+方法二：使用 `bind`
+```js
+const extraParameter = 'hello world'
+button.addEventListener('click', callback.bind(null, extraParameter))
+```
+
+方法三：自定义属性 `dataset`
+:::code-group
+
+```js
+button.addEventListener('click', callback)
+function callback(event) {
+  const {extra} = event.target.dataset
+}
+```
+```html
+<button data-extra="hello world">click</button>
+```
+:::
+
+
+## 31. Web Worker API
+Web Worker 能创建一个独立于 Web 应用程序主执行程序的后台线程，并运行脚本操作，使主线程的运行（通常是 UI 线程）的运行不会被阻塞
+
+Web Worker 使用限制
+
+1. 同源限制：只能运行同源脚本文件
+2. DOM限制：无法获取 DOM 对象，但可以使用 `navigator` 和 `location` 对象
+
+```js
+function createWorker(f) {
+  const blob = new Blob[`(${f.toString()})()`]
+  const url = URL.createObjectURL(blob)
+  const worker = new Worker(url)
+  return worker
+}
+```
 
 
 ## 链接

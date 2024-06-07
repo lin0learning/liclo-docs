@@ -203,16 +203,90 @@ import ClockVue from '../.vitepress/theme/components/Clock.vue'
 </style>
 ```
 **相关 JS 逻辑：**
+
 ```js [index.js]
 /** @type {HTMLCanvasElement} */
 const canvasEl = document.querySelector("#clock")
-
 const ctx = canvasEl.getContext('2d')
+
+// 创建离屏画布
+const offscreenCanvas = document.createElement('canvas')
+offscreenCanvas.width = 300
+offscreenCanvas.height = 300
+const offscreenCtx = offscreenCanvas.getContext('2d')
+
+function drawStaticElements() {
+  offscreenCtx.save()
+
+  // 背景
+  offscreenCtx.save()
+  offscreenCtx.translate(150, 150)
+  offscreenCtx.fillStyle = 'white'
+  offscreenCtx.beginPath()
+  offscreenCtx.arc(0, 0, 130, 0, Math.PI * 2)
+  offscreenCtx.fill()
+  offscreenCtx.restore()
+
+  // 数字
+  let list = [3,4,5,6,7,8,9,10,11,12,1,2]
+  offscreenCtx.save()
+  offscreenCtx.translate(150, 150)
+  offscreenCtx.font = "30px fangsong"
+  offscreenCtx.textAlign = 'center'
+  offscreenCtx.textBaseline = 'middle'
+  for (let i = 0; i < list.length; i++) {
+    let x = 100 * Math.cos(Math.PI * 2 / 12 * i)
+    let y = 100 * Math.sin(Math.PI * 2 / 12 * i)
+    offscreenCtx.fillText(list[i], x, y)
+  }
+  offscreenCtx.restore()
+
+  // 圆心
+  offscreenCtx.save()
+  offscreenCtx.translate(150, 150)
+  offscreenCtx.beginPath()
+  offscreenCtx.arc(0, 0, 4, 0, Math.PI * 2)
+  offscreenCtx.fill()
+  offscreenCtx.restore()
+
+  // 时针刻度
+  offscreenCtx.save()
+  offscreenCtx.translate(150, 150)
+  for (let i = 0; i < 12; i++) {
+    offscreenCtx.beginPath()
+    let deg = Math.PI * 2 / 12 * i
+    offscreenCtx.lineWidth = 3
+    offscreenCtx.moveTo(130 * Math.sin(deg), 130 * Math.cos(deg))
+    offscreenCtx.lineTo(120 * Math.sin(deg), 120 * Math.cos(deg))
+    offscreenCtx.stroke()
+  }
+  offscreenCtx.restore()
+
+  // 分针刻度
+  offscreenCtx.save()
+  offscreenCtx.translate(150, 150)
+  for (let i = 1; i <= 60; i++) {
+    if (i % 5 === 0) continue
+    offscreenCtx.beginPath()
+    let deg = Math.PI * 2 / 60 * i
+    offscreenCtx.lineWidth = 1
+    offscreenCtx.moveTo(130 * Math.sin(deg), 130 * Math.cos(deg))
+    offscreenCtx.lineTo(125 * Math.sin(deg), 125 * Math.cos(deg))
+    offscreenCtx.stroke()
+  }
+  offscreenCtx.restore()
+
+  offscreenCtx.restore()
+}
+drawStaticElements()
 
 requestAnimationFrame(draw)
 function draw() {
   ctx.clearRect(0, 0, 300, 300)
   ctx.save()
+
+  // 绘制静态部分
+  ctx.drawImage(offscreenCanvas, 0, 0)
 
   let time = new Date()
   let hour = time.getHours()
@@ -220,30 +294,7 @@ function draw() {
   let seconds = time.getSeconds()
   let mill = time.getMilliseconds()
 
-  // 1. 背景
-  ctx.save()
-  ctx.translate(150, 150)
-  ctx.fillStyle = 'white'
-  ctx.beginPath()
-  ctx.arc(0, 0, 130, 0, Math.PI * 2)
-  ctx.fill()
-  ctx.restore()
-
-  // 2. 数字
-  let list = [3,4,5,6,7,8,9,10,11,12,1,2]
-  ctx.save()
-  ctx.translate(150, 150)
-  ctx.font = "30px fangsong"
-  ctx.textAlign = 'center'
-  ctx.textBaseline = 'middle'
-    for (let i = 0; i < list.length; i++) {
-    let x = 100 * Math.cos(Math.PI * 2 / 12 * i)
-    let y = 100 * Math.sin(Math.PI * 2 / 12 * i)
-    ctx.fillText(list[i], x, y)
-  }
-  ctx.restore()
-
-  // 3. 时针
+  // 时针
   ctx.save()
   ctx.translate(150, 150)
   ctx.rotate(
@@ -258,7 +309,7 @@ function draw() {
   ctx.stroke()
   ctx.restore()
 
-  // 4. 分针
+  // 分针
   ctx.save()
   ctx.translate(150, 150)
   ctx.rotate(
@@ -273,7 +324,7 @@ function draw() {
   ctx.stroke()
   ctx.restore()
 
-  // 5. 秒针
+  // 秒针
   ctx.save()
   ctx.translate(150, 150)
   ctx.rotate(
@@ -289,53 +340,14 @@ function draw() {
   ctx.stroke()
   ctx.restore()
 
-  // 6. 圆心
-  ctx.save()
-  ctx.translate(150, 150)
-  ctx.beginPath()
-  ctx.arc(0, 0, 4, 0, Math.PI * 2)
-  ctx.fill()
-  ctx.restore()
-
-  // 7.1 时针刻度
-  ctx.save()
-  ctx.translate(150, 150)
-  // 方法一：计算坐标点
-  for (let i = 0; i < 12; i++) {
-    ctx.beginPath()
-    let deg = Math.PI * 2 / 12 * i
-    ctx.lineWidth = 3
-    ctx.moveTo(130 * Math.sin(deg), 130 * Math.cos(deg))
-    ctx.lineTo(120 * Math.sin(deg), 120 * Math.cos(deg))
-    ctx.stroke()
-  }
-  // 方法二：旋转坐标轴
-  // for (let i = 0; i < 12; i++) {
-  //   ctx.rotate(Math.PI * 2 / 12)
-  //   ctx.lineWidth = 3
-  //   ctx.beginPath()
-  //   ctx.moveTo(0, -130)
-  //   ctx.lineTo(0, -122)
-  //   ctx.stroke()
-  // }
-  ctx.restore()
-
-  // 7.2 分针刻度
-  ctx.save()
-  ctx.translate(150, 150)
-  for (let i = 1; i <= 60; i++) {
-    if (i % 5 === 0) continue
-    ctx.beginPath()
-    let deg = Math.PI * 2 / 60 * i
-    ctx.lineWidth = 1
-    ctx.moveTo(130 * Math.sin(deg), 130 * Math.cos(deg))
-    ctx.lineTo(125 * Math.sin(deg), 125 * Math.cos(deg))
-    ctx.stroke()
-  }
-  ctx.restore()
-
   // end
   ctx.restore()
   requestAnimationFrame(draw)
 }
 ```
+
+以上代码：
+1. 创建离屏画布 ` offscreenCanvas` 并在其上绘制静态部分；
+2. 在每帧动画中，仅绘制动态部分（时针、分针和秒针）；
+3. 通过 `ctx.drawImage(offscreenCanvas, 0, 0)` 将离屏画布的内容绘制到主画布上，减少每帧的重复绘制；
+4. 在高刷新率的屏幕中，`requestAnimationFrame` 的回调可能会被调用得更加频繁，从而导致动画在这些屏幕上运行的更快。为了确保动画在各种刷新率的屏幕上都能保持相同的速度，我们需要基于时间来更新动画，而不是简单地依赖帧数。

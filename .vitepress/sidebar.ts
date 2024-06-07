@@ -28,6 +28,13 @@ const sidebar: DefaultTheme.Sidebar | undefined = {
         { text: 'Node', link: '/Production/node' },
         { text: 'Project', link: '/Production/Project' },
       ]
+    },
+    {
+      text: '🛀 其他',
+      collapsed: false,
+      items: [
+        { text: 'VS Code', link: '/Other/VS Code.md' }
+      ]
     }
   ],
   '/CSS/': [
@@ -38,6 +45,7 @@ const sidebar: DefaultTheme.Sidebar | undefined = {
         { text: '样式&布局', link: '/CSS/样式&布局' },
         { text: '现代Web布局', link: '/CSS/现代Web布局' },
         { text: 'Canvas入门', link: '/CSS/Canvas入门' },
+        { text: 'SVG入门', link: '/CSS/SVG入门' },
         { text: 'Grid布局', link: '/CSS/Grid布局' },
         { text: 'Sass基本用法', link: '/CSS/Sass基本用法' },
       ]
@@ -51,6 +59,7 @@ const sidebar: DefaultTheme.Sidebar | undefined = {
         { text: 'JavaScript', link: '/JavaScript/JavaScript' },
         { text: 'ESModule', link: '/JavaScript/ESModule' },
         { text: 'Promise', link: '/JavaScript/Promise' },
+        { text: 'JS工具函数', link: '/JavaScript/JS Utils'}
       ]
     },
   ],

@@ -410,7 +410,9 @@ context.addEventListener('click', (e) => {
 - `event.stopPropagation()`: 阻止事件冒泡
 
 
-## 音视频采集 `getUserMedia`
+
+## 17. 音视频采集 `getUserMedia`
+
 ```js
 const localVideo = ref()
 
@@ -423,3 +425,94 @@ const getLocalStream = async () => {
   localVideo.value.play()
 }
 ```
+
+
+
+
+
+## 18. 动态创建 SVG 元素
+
+:::info
+
+**可缩放矢量图形**（**Scalable Vector Graphics，SVG**）基于 [XML](https://developer.mozilla.org/zh-CN/docs/Web/XML) 标记语言，用于描述二维的[矢量图形](https://zh.wikipedia.org/wiki/矢量图形)。
+
+:::
+
+使用`document.createElement()`方法创建 `<svg>` 元素时，会出现在页面中不显示的情况，这是由于 `<svg>` 不属于 HTML5 元素，而属于 XML 标准。创建 svg 元素需要使用`document.createElementNS()`,并在第一个参数中传入指定的命名空间 URI：`http://www.w3.org/2000/svg`。svg 元素一般通过 `setAttribute` 方法来设置属性值。
+
+动态创建 svg 及其子元素时，如果 svg 子元素的命名空间与 svg 容器的<font color="red">命名标签不一致</font>时，子元素会<font color="red">无法显示</font>，但在浏览器F12-Elements中能看到 DOM 结构。
+
+举例说明：
+
+```html
+<svg id="svg" xmlns="http://www.w3.org/2000/svg"></svg>
+
+<script>
+const oSvg = document.getElementById('svg')
+
+const text1 = document.createElementNS('http://www.w3.org/2000/svg', 'text')
+text1.innerHTML = 'hello world'
+
+const text2 = document.createElementNS('http://www.w3.org/1999/svg', 'text')
+text2.innerHTML = 'hello world'
+
+const text2 = document.createElement('text')
+text2.innerHTML = 'hello world'
+  
+oSvg.appendChild(text1)  // 正常显示
+oSvg.appendChild(text1)  // 不显示
+oSvg.appendChild(text1)  // 不显示
+</script>
+```
+
+
+
+**封装代码：**
+
+```ts
+type Tags = 'svg'|'g'|'path'|'filter'|'animate'|'marker'|'line'|'polyline'|'rect'|'circle'|'ellipse'|'polygon'|'text'
+type Attrs = import('vue').SVGAttributes
+type Numberish = number | string
+
+function createTag(tagName:Tags, attrs: Attrs): Node {
+  let svgTags = ['svg','g','path','filter','animate','marker','line','polyline','rect','circle','ellipse','polygon','text']
+  let el
+  if (svgTags.indexOf(tagName) >= 0) {
+    el = document.createElementNS('http://www.w3.org/2000/svg', tagName)
+  } else {
+    el = document.createElement(tagName)
+  }
+  
+  for (let attr in attrs) {
+    el.setAttribute(attr, attrs[attr])
+  }
+  return el
+}
+```
+
+**实际使用：**
+```js
+// 1. rect
+let devRectLeft = createTag('rect', {
+  x: 100,
+  y: 32,
+  width: '8',
+  height: '8',
+  stroke: "#4dff4b",
+  rx: '2',
+  ry: '2',
+  'stroke-width': '2'
+})
+
+// 2. line
+let lineLeft = createTag('line', {
+  x1: 154,
+  y1: 32,
+  x2: 160,
+  y2: 44,
+  stroke: '#26c7ff',
+  'stroke-width': '2'
+})
+```
+
+实践：![image-20240529113428900](https://pic-liclo.oss-cn-chengdu.aliyuncs.com/img2/202405291135780.png)

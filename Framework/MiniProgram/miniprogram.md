@@ -702,10 +702,9 @@ Page({
 - 获取设备信息： `wx.getSystemInfo(Object object)`
 - 获取位置信息：`wx.getLocation`
 
-注意：自 2022 年 7 月 14日后发布的小程序，使用8个地理位置相关接口，需要声明该字段
+注意：自 2022 年 7 月 14日后发布的小程序，使用8个地理位置相关接口，需要在 `app.json` 中声明该字段
 
-```json
-// app.json
+```json [app.json]
 {
   "requiredPrivateInfos": [
     "getLocation"
@@ -716,6 +715,13 @@ Page({
     }
   }
 }
+```
+在 Page/Component 中使用：
+```js
+const location = await wx.getLocation({type: 'wgs84'})
+if (location.errMsg !== 'getLocation:ok') return
+const {latitude, longitude} = location
+// ...
 ```
 
 ![image-20240306161603399](https://pic-liclo.oss-cn-chengdu.aliyuncs.com/img2/202403061616575.png)
@@ -831,7 +837,7 @@ wx.login({
 
 
 
-### web-view
+## web-view
 
 承载网页的容器（小程序不支持使用iframe）。会自动铺满整个小程序页面，**个人类型的小程序暂不支持使用。**
 
@@ -900,13 +906,36 @@ Page({
 
 
 
+## 下拉刷新
+应用场景：下拉刷新页面数据或执行`onLoad`函数中的相关功能
+:::code-group
+```js [index.js]
+Page({
+  onPullDownRefresh() {
+    wx.showNavigationBarLoading() // navBar显示loading状态
+
+    /* your code here */
+
+    wx.hideNavigationBarLoading() // navBar隐藏loading状态
+    wx.stopPullDownRefresh()  // 停止下拉刷新
+  }
+})
+```
+```json [index.json]
+{
+  "enablePullDownRefresh": true, // 当前页
+  "backgroundTextStyle": "dark"  // 顶部显示颜色为深色的三个点
+}
+```
+:::
 
 
 
 
-### 媒体播放
 
-#### 1. 音乐播放
+## 媒体播放
+
+### 1. 音乐播放
 
 ```js
 // 1. 创建播放器（公共）
@@ -978,7 +1007,7 @@ function padLeft(time) {
 
 
 
-#### 2. 视频播放
+### 2. 视频播放
 
 使用微信小程序提供的`<video>`组件
 

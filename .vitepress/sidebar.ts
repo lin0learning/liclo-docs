@@ -33,7 +33,8 @@ const sidebar: DefaultTheme.Sidebar | undefined = {
       text: '🛀 其他',
       collapsed: false,
       items: [
-        { text: 'VS Code', link: '/Other/VS Code.md' }
+        { text: 'VS Code', link: '/Other/VS Code.md' },
+        { text: 'dayjs & momentjs', link: '/Other/dayjs momentjs.md' }
       ]
     }
   ],
@@ -48,6 +49,7 @@ const sidebar: DefaultTheme.Sidebar | undefined = {
         { text: 'SVG入门', link: '/CSS/SVG入门' },
         { text: 'Grid布局', link: '/CSS/Grid布局' },
         { text: 'Sass基本用法', link: '/CSS/Sass基本用法' },
+        { text: 'Houdini API', link: '/CSS/Houdini API'}
       ]
     },
   ],
@@ -59,7 +61,8 @@ const sidebar: DefaultTheme.Sidebar | undefined = {
         { text: 'JavaScript', link: '/JavaScript/JavaScript' },
         { text: 'ESModule', link: '/JavaScript/ESModule' },
         { text: 'Promise', link: '/JavaScript/Promise' },
-        { text: 'JS工具函数', link: '/JavaScript/JS Utils'}
+        { text: 'JS工具函数', link: '/JavaScript/JS Utils' },
+        { text: 'ECMAScript', link: '/JavaScript/EcmaScript.md' }
       ]
     },
   ],
@@ -111,7 +114,8 @@ const sidebar: DefaultTheme.Sidebar | undefined = {
       items: [
         { text: 'HTTP Docs', link: '/HTTP/http' },
         { text: '基本请求方式', link: '/HTTP/基本请求方式' },
-        { text: 'Axios 封装', link: '/HTTP/封装axios' }
+        { text: 'Axios 封装', link: '/HTTP/封装axios' },
+        { text: 'websocket 封装', link: '/HTTP/封装websocket.md' }
       ]
     }
   ]

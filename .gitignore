@@ -4,6 +4,7 @@ dist
 cache
 component.d.ts
 .vitepress/cache
+.DS_Store
 
 
 # local env files

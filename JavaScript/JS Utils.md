@@ -366,3 +366,40 @@ const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 /** 检测暗色主题 */
 const isDarkMode = () => window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
 ```
+
+**17. 请求json文件获取配置**
+
+```ts
+function queryJSONConfig(url: string) {
+  return new Promise((resolve, reject) => {
+    fetch(url).then(res => res.json()).then(res => {
+      resolve(res)
+    }).catch(err => {
+      reject(err)
+    })
+  })
+}
+```
+
+
+
+**18. 对象数组按照指定顺序进行排序**
+
+通过使用一个映射（map）来存储排序顺序，然后根据顺序映射对数据进行排序（使用`sort()`方法）
+
+```ts
+const orderMap = ['车载', 'ZC', '联锁', 'ATS', 'DCS', '道岔', '电源', '计轴', '信号机', 'LEU', '漏缆'].reduce(
+  (prev, cur, index) => {
+    prev[cur] = index
+    return prev
+  }, {}
+)
+
+const adviceList = ref<device[]>([])
+const sortedList = computed(() => {
+  return adviceList.value.sort((a, b) => {
+    return orderMap[a.deviceTypeName] - orderMap[b.deviceTypeName]
+  })
+})
+```
+

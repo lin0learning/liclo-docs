@@ -869,6 +869,40 @@ const todos = []
  */
 ```
 
+使用 `@type` 声明定义参数的类型，以获取编辑器 intelligence：
+
+```js
+/* @type {import('types/global.js').Socket} */
+let initSocketInstance = null;
+```
+
+使用 `@param` 声明函数的对象类型参数(options)：
+
+```js
+/**
+ * @description 获取不同站点对应的主机地址
+ * @param {object} options 配置对象
+ * @param {string} options.name 请求的模块，具体名字可以在src/config/conf_client_prod.json中查看
+ * @param {'http'|'websocket'} options.type 请求类型 - http 或 websocket，默认为http
+ * @param {string} options.mssId 站点ID，默认为配置中的default_mssid
+ * @param {boolean} options.isUnique 
+ * @returns {string} 返回站点服务器地址，例如172.5.32.194:9001
+ */
+function initHost({name = '', type = 'http', mssId, isUnique}) {
+  // ...
+}
+```
+
+使用 `@template` 声明泛型类型参数：
+```js
+/**
+ * @template T
+ * @param {T} obj
+ * @returns {T}
+ */
+function deepClone(obj) {}
+```
+
 
 
 

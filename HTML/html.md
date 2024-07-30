@@ -224,7 +224,7 @@ window.addEventListener("beforeunload", () => {
 > caniuse usage: <font color="#277c32">97.74% </font>. 通过 HTTP POST 传输少量异步数据。它主要用于将统计数据发送到 Web 服务器，同时避免了用传统技术（如：[`XMLHttpRequest`](https://developer.mozilla.org/zh-CN/docs/Web/API/XMLHttpRequest)）发送分析数据的一些问题。
 
 ```js
-Navigator.sendBeacon(url, data)
+navigator.sendBeacon(url, data)
 ```
 
 data数据支持的四种类型：
@@ -233,6 +233,20 @@ data数据支持的四种类型：
 - application/x-www-form-urlencoded
 - Blob
 - FormData
+
+该方法主要用于满足统计和诊断代码的需要，通常在卸载（unload）文档之前向 Web 服务器发送数据。最可靠的方法是在 `visibilitychange` 事件发生时发送数据：
+
+```js
+document.addEventListener('visibilitychange', function logData() {
+  if (document.visibilityState === 'hidden') {
+    navigator.sendBeacon('/log', analyticsData)
+  }
+})
+```
+
+
+
+
 
 
 

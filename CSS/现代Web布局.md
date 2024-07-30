@@ -603,6 +603,58 @@ flex-basis: calc((100% - 1rem) / 2);
 
 
 
+## 检查浏览器属性支持
+
+以`gap`属性为例，使用 `gap` 属性，我们可以在容器内的项目之间定义等距离的间隔，不需要为每个项目都手动设置 margin 或 padding。
+
+```css
+.container {
+  display: flex;
+  gap: 20px;
+  row-gap: 20px;
+  column-gap: 20px;
+}
+```
+
+由于 `gap` 属性是 Flexbox 布局的新特性，因此在使用 `gap` 属性前，需要检查浏览器是否支持该特性，并在不支持时提供备用方案。
+
+为了检查 `gap` 属性的支持，我们可以使用 `@supports` 媒体查询。`@supports` 是 CSS 中的一个条件规则，用于检测浏览器是否支持某个 CSS 特性或属性。
+
+:::info
+
+`@supports: selector()` 为比较新的 CSS3 属性，其兼容性<font color="red">也欠佳</font>，在较低版本的浏览器中，不可用。一般支持`@supports`选择器的浏览器也支持 `gap` 属性。
+
+:::
+
+```css
+@supports (gap: 20px) {
+  /* 支持 gap 属性时应用 */
+  .container {
+    display: flex;
+    gap: 20px;
+  }
+}
+
+@supports not (gap: 20px) {
+  /* 不支持 gap 属性的备用方案 */
+  .container {
+    display: flex;
+    margin: -10px;
+  }
+  .container > * {  /* 匹配所有一级子元素 */
+    margin: 10px;
+  }
+}
+```
+
+
+
+
+
+
+
+
+
 ## CSS 自定义属性
 
 ```html

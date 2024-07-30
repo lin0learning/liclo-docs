@@ -62,7 +62,8 @@ const sidebar: DefaultTheme.Sidebar | undefined = {
         { text: 'ESModule', link: '/JavaScript/ESModule' },
         { text: 'Promise', link: '/JavaScript/Promise' },
         { text: 'JS工具函数', link: '/JavaScript/JS Utils' },
-        { text: 'ECMAScript', link: '/JavaScript/EcmaScript.md' }
+        { text: 'ECMAScript', link: '/JavaScript/EcmaScript.md' },
+        { text: 'Web Worker', link: '/JavaScript/WebWorker.md' }
       ]
     },
   ],

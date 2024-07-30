@@ -1268,23 +1268,113 @@ function callback(event) {
 ```
 :::
 
+## 31. isArray函数
 
-## 31. Web Worker API
-Web Worker 能创建一个独立于 Web 应用程序主执行程序的后台线程，并运行脚本操作，使主线程的运行（通常是 UI 线程）的运行不会被阻塞
-
-Web Worker 使用限制
-
-1. 同源限制：只能运行同源脚本文件
-2. DOM限制：无法获取 DOM 对象，但可以使用 `navigator` 和 `location` 对象
-
-```js
-function createWorker(f) {
-  const blob = new Blob[`(${f.toString()})()`]
-  const url = URL.createObjectURL(blob)
-  const worker = new Worker(url)
-  return worker
+默认情况下，使用 `Object.prototype.toString.call()` 原型链方法能够实现大部分功能需求：
+```ts
+function isArray(item: any) {
+  const result = Object.prototype.toString.call(item)
+  if (result === '[object Array]') return true
+  return false
 }
 ```
+所有继承自 `Object.prototype` 的对象都继承 `toString()` 方法。在 ES6 阶段后，可以增加一个 `[Symbol.toPrimitive]()` 方法，该方法允许对转换过程有更多的控制，并且对于任意的类型转换，且总是优先于 valueOf 或 toString。
+```ts
+
+```
+
+
+
+## 32. 表单的元素选择
+
+使用form提交表单触发事件函数。
+```vue
+<template>
+	<form @submit.prevent="onSearch">
+    <div class="search-box">
+      <input v-model="query" type="text" placeholder="输入关键字" />
+      <button></button>
+    </div>
+  </form>
+</template>
+<script setup lang="ts">
+function onSearch() {
+  // ...
+}
+</script>
+```
+
+## 33. 最长递增子序列（diff算法）
+
+```ts
+/**
+ * 求最长递增子序列
+ * @param {number[]} nums
+ */
+type Nums = number[]
+function LIS(nums: Nums): Nums {}
+
+// expect: [1, 2, 3, 6, 9]
+LIS([4, 5, 1, 2, 7, 3, 6, 9])
+```
+
+
+
+## 34. 实现类的多继承
+
+在以下代码中，`Mix`类和 `copyProperties`方法的使用是为了实现类的多继承。JavaScript 本身不直接支持多继承，因此通过这种方式来实现将多个类的属性和方法合并到一个类中。
+
+多继承的需求通常是为了让一个类能够继承多个类的功能。通过 `mix` 函数，你可以将多个类的属性和方法混合到一个新类中，而不是通过传统的单继承方式。
+
+代码实现：
+
+```js
+// 类的多继承实现
+function mix(...mixins) {
+  class Mix {
+    // 如果不需要拷贝实例属性下面这段代码可以去掉
+    constructor() {
+      for (let mixin of mixins) {
+        copyProperties(this, new mixin()); // 拷贝实例属性
+      }
+    }
+  }
+
+  for (let mixin of mixins) {
+    copyProperties(Mix, mixin); // 拷贝静态属性
+    copyProperties(Mix.prototype, mixin.prototype); // 拷贝原型属性
+  }
+
+  return Mix;
+}
+// 深拷贝
+function copyProperties(target, source) {
+  for (let key of Reflect.ownKeys(source)) {
+    if (key !== 'constructor' && key !== 'prototype' && key !== 'name') {
+      let desc = Object.getOwnPropertyDescriptor(source, key);
+      Object.defineProperty(target, key, desc);
+    }
+  }
+}
+```
+
+`copyProperties`方法作用：
+
+1. **遍历 `source` 的所有自有属性**
+   - `Reflect.ownKeys(source)` 返回一个数组，包含 `source` 对象的所有自有属性（包括不可枚举的属性和符号属性）
+2. **排除一些特殊属性**
+   - `if (key !== 'constructor' && key !== 'prototype' && key !== 'name')` 用于排除 `constructor`、`prototype` 和 `name` 这些特殊属性。因为这些属性通常不需要复制
+3. **获取属性描述符**
+   - `let desc = Object.getOwnPropertyDescriptor(source, key);` 获取 `source` 对象上当前属性 `key` 的属性描述符。描述符包含了属性的详细信息（例如值、可枚举性、可配置性等）
+4. **定义属性到 `target`**
+   - `Object.defineProperty(target, key, desc);` 将获取到的属性描述符应用到 `target` 对象上。这样，`target` 对象就会拥有 `source` 对象的这个属性，并且属性的特性（例如值、可枚举性、可配置性等）与 `source` 对象上这个属性的特性相同
+
+**总结**
+
+`copyProperties` 方法的核心功能是在 `target` 对象上定义 `source` 对象的所有自有属性（排除一些特殊属性），并确保属性的特性（值、可枚举性、可配置性等）保持一致。通过使用 `Reflect.ownKeys`、`Object.getOwnPropertyDescriptor` 和 `Object.defineProperty`，可以精确地复制属性，包括不可枚举的属性和符号属性。
+
+
+
 
 
 ## 链接

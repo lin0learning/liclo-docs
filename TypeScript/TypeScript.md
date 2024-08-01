@@ -1069,3 +1069,44 @@ type B<T> = [T] extends [any] ? T[] : never
 type u1 = A<string | number> // type u1 = string[] | number[]
 type u2 = B<string | number> // type u2 = (string | number)[]
 ```
+
+
+
+
+
+## 元组生成联合类型
+
+在 TypeScript 中，使用 `typeof` 关键字和索引类型查询操作符 `number` 可以创建一个联合类型。
+
+```ts
+const colors = ['a', 'b', 'c'] as const
+type Colors = typeof colors[number]  // "a" | "b" | "c"
+```
+
+1. `as const` 断言：
+
+   ```ts
+   const colors1 = ['a', 'b', 'c']  // string[]
+   const colors2 = ['a', 'b', 'c'] as const  // readonly ["a", "b", "c"]
+   ```
+
+   - `as const` 是 TypeScript 的一种断言，它将数组 `colors` 中的每个元素的类型设置为字面量类型，而不是更宽泛的 `string` 类型。也就是说，`colors` 的类型变为 `readonly ['a', 'b', 'c']` 而不是 `string[]`。
+
+2. `typeof colors`：
+
+   - `typeof colors` 获取常量 `colors` 的类型。在这个例子中，`typeof colors` 的类型是 `readonly ['a', 'b', 'c']`。
+
+3. 索引类型查询操作符 `number`：
+   ```ts
+   type Colors = typeof colors[number]
+   ```
+
+   `typeof colors[number]` 表示获取数组 `colors` 中每个元素的类型。这实际上是获取数组类型 `readonly ['a', 'b', 'c']` 的每个元素类型的联合类型。因此，`typeof colors[number]` 生成的类型是 `'a' | 'b' | 'c'`。
+
+4. 封装泛型工具
+   ```ts
+   type Array2Union<T extends readonly any[]> = T[number]
+   ```
+
+   
+

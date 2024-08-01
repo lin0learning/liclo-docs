@@ -353,6 +353,13 @@ Access-Control-Request-Headers: X-PRODUCT
 ## 8. HTTP状态码记录：
 
 1. **101**：`Switching Protocols`（协议切换）表示服务器应客户端升级协议的请求，正在切换协议。（如websocket）
+   默认情况下，客户端使用 HTTP 长轮询传输建立连接，在使用Socket.IO时，可以在网络监视器中看到![Successful upgrade](https://socket.io/zh-CN/assets/images/network-monitor-2e47dbe233100aa290595f8687a9fcba.png)
+   1. 握手 (包含会话 ID — 此处, `zBjrh...AAAK` — 用于后续请求)
+   2. 发送数据 (HTTP 长轮询)
+   3. 接收数据 (HTTP 长轮询)
+   4. 升级 (WebSocket)
+   5. 接收数据 (HTTP 长轮询, WebSocket连接建立成功后关闭)
+
 2. **302**：`Found`。请求的目标资源临时移动到了另一个 URI 上，服务器会在响应头的 Location 字段放上这个不同的 URI，浏览器可以使用 Location 中的 URI 进行自动重定向
 3. **304**：`Not Modified`。如果客户端发送了一个带条件的GET 请求且该请求已被允许，而文档的内容（自上次访问以来或者根据请求的条件）并没有改变，则服务器应当返回这个304状态码。简单表述：服务端执行了 `GET` 请求，但文件未变化。首次请求服务端返回`ETab`，在第二次请求后请求头携带这个`Etag`，会跟第二次的`Etag`对比。
 4. **307**：`Internal Redirect`。307 的定义实际上和  302 是一致的，唯一的区别在于：307 状态码不允许浏览器将原本为 POST 的请求重定向到 GET 请求上。

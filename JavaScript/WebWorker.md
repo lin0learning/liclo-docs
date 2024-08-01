@@ -339,7 +339,7 @@ const worker1 = new calcWorker()
 
 const worker2 = new Worker(new URL('@/worker/calc.ts', import.meta.url)) // 通过构造器导入
 
-const worker3 = new Worker('calc.js')
+const worker3 = new Worker('calc.js')   // 通过构造器导入
 </script>
 ```
 
@@ -350,6 +350,10 @@ const worker3 = new Worker('calc.js')
 
 
 
+
+
+
+## 附录
 
 **类的多继承实现**
 

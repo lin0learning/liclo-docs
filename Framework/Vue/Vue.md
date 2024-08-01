@@ -85,7 +85,69 @@ defineProps<{
 
 
 
+## Vue3生命周期
 
+**Vue3 与 Vue2 生命周期的区别**
+
+在 vue3 的生命周期中，取消了 `beforeDestroy` 和 `destroyed` 两个生命周期。取而代之的是 `beforeUnmount` 以及 `unmounted`。
+
+**Vue3 生命周期的两种写法：**
+
+1. 配置项的形式
+2. 组合式api的形式
+
+
+
+**配置项的形式**
+
+```js
+export default {
+  //配置项的形式使用生命周期钩子
+  beforeCreate(){
+    console.log('beforeCreate');
+  },
+  created(){
+    console.log('created');
+  },
+  beforeMount(){
+    console.log('beforeMount');
+  },
+  mounted(){
+    console.log('mounted');
+  },
+  beforeUpdate(){
+    console.log('beforeUpdate');
+  },
+  updated(){
+    console.log('updated');
+  },
+  beforeUnmount(){
+    console.log('beforeUnmount');
+  },
+  unmounted(){
+    console.log('unmounted');
+  }
+}
+```
+
+**组合式api的形式**
+
+使用组合式api的形式，生命周期的名称发生了一些小变化，如下：
+
+- beforeCreate -> 使用 setup()
+- created -> 使用 setup()
+- beforeMount -> onBeforeMount
+- mounted -> onMounted
+- beforeUpdate -> onBeforeUpdate
+- updated -> onUpdated
+- beforeUnmount-> onBeforeUnmount
+- unmounted-> onUnmounted
+
+在使用生命周期时，需要先引入：
+
+```js
+import {onBeforeMount,onMounted,onBeforeUpdate,onUpdated,onBeforeUnmount,onUnmounted} from  'vue'
+```
 
 
 

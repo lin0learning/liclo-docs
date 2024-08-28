@@ -196,7 +196,7 @@ const props = withDefaults(defineProps<Props>(), {
 })
 ```
 
-针对类型的 props/emits 声明
+**针对类型的 props/emits 声明**
 
 ```vue
 <!-- 父组件 -->
@@ -219,6 +219,56 @@ const props = withDefaults(defineProps<Props>(), {
   }>()
 </script>
 ```
+
+**Props校验**
+
+```js
+defineProps({
+  propA: Number,
+  propB: [String, Number],
+  propC: {
+    type: String,
+    required: true
+  },
+  // 必传但可为 null 的字符串
+  propD: {
+    type: [String, null],
+    required: true
+  },
+  // 对象类型的默认值
+  propF: {
+    type: Object,
+    // 对象或数组的默认值，必须从一个工厂函数返回
+    default(rawProps) {
+      return {message: 'hello'}
+    }
+  },
+  propG: {
+    type: Array,
+    default: () => []
+  },
+  // 自定义类型校验函数
+  // 在 3.4+ 中完整的 props 作为第二个参数传入
+  propH: {
+    validator(value, props) {
+      return ['success', 'warning', 'danger'].includes(value)
+    }
+  },
+  // 函数类型的默认值
+  propI: {
+    type: Function,
+    // 与对象或数组的默认值不同，这不是一个工厂函数。
+    // 这会是一个用来作为默认值的函数
+    default() {
+      return 'Default function'
+    }
+  }
+})
+```
+
+
+
+
 
 
 

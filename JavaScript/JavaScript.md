@@ -501,6 +501,65 @@ targetWindow.postMessage(message, targetOrigin, [transfer])
 window.top.postMessage({type: 'alarm'}, '*')
 ```
 
+还可以在不同框架之间（iframe），页面或组件之间，使用`window.postMessage` 结合 `window.addEventListener('message')` 来进行消息传递。
+
+```js
+window.addEventListener('message', (event) => {})
+```
+
+`event` 属性包含：
+
+- data：从其他 window 传递过来的数据副本
+- origin：调用 `postMessage`时，消息发送窗口的 origin，例如：'http://www.localhost:8080'
+- source：对发送消息的窗口对象的引用
+
+
+
+**一、不同 origin 的两个窗口之间建立双向数据通信**
+
+```js
+ // localhost:9999/index
+// 接收消息
+window.addEventListener('message', (e) => {
+  console.log(e.data)
+})
+// 发送消息
+const targetWindow = window.open('http://localhost:8888/user');
+setTimeout(()=>{
+  targetWindow.postMessage('来自9999的消息', 'http://localhost:8888')
+}, 3000)
+```
+
+```js
+// localhost:8888/user页面
+window.addEventListener('message', (e) => {
+  console.log(e.data)
+  if (event.origin !== "http://localhost:9999") 
+  return;
+  e.source.postMessage('来自8888的消息', e.origin)
+})
+```
+
+
+
+**二、页面与嵌套的 iframe 消息传递**
+
+```js
+let iframe = document.getElementById('iframe')
+
+iframe.onload = function() {
+  iframe.contentWindow.postMessage({token: store.state.token}, '*')
+}
+
+window.addEventListener('message', (e) => {
+  e.data
+})
+```
+
+
+
+
+
 
 
 ## 15. 获取页面所有 a 标签 href 值

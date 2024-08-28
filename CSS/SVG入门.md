@@ -279,3 +279,25 @@ SVG 路径（path）
 </svg>
 ```
 
+6. 动态切换svg（v-html）
+
+```vue
+<template>
+  <div ref="svgRef" v-html="svgString"></div>
+</template>
+<script setup>
+const svgString = ref('')
+function loadSvg(stationId) {
+  return axios.get(`conf_axleSvg/${stationId}.svg`).then(res => {
+    svgString.value = res.data
+  }).catch(err => {
+    svgString.value = ''
+  })
+}
+</script>
+```
+
+数据处理操作DOM原则：
+
+- 单个数据处理更新会使浏览器重绘，应该统一收集数据更新，再一次性更新，浏览器只重绘一次；
+- 将新数据与原数据做比较，如果没有变化，则不更新视图，只更新数据。

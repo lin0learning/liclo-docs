@@ -1,6 +1,7 @@
 # Javascript 工具函数
 
 **1. 创建 svg 元素**
+
 ```js
 /**
  * 创建svg tag
@@ -472,6 +473,33 @@ function formatSizeUnits(kb) {
   }
   
   return `${kb.toFixed(2)} ${units[unitIndex]}`
+}
+```
+
+
+
+**21. 将对象的key大写**
+
+```ts
+function transformKeys(obj, ignoreKeys = []) { //需补充ts类型
+  const newObj = {}
+  
+  for (const key in obj) {
+    if (obj.hasOwnProperty(key)) {
+      if (ignoreKeys.includes(key)) {
+        newObj[key] = obj[key]
+      } else {
+        const newKey = capitalizeFirstLetter(key)
+        newObj[newKey] = obj[key]
+      }
+    }
+  }
+  return newObj
+}
+
+
+function capitalizeFirstLetter(str:string) {
+  return str.charAt(0).toUpperCase() + str.slice(1)
 }
 ```
 

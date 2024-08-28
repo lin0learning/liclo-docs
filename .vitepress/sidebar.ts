@@ -117,7 +117,8 @@ const sidebar: DefaultTheme.Sidebar | undefined = {
         { text: '基本请求方式', link: '/HTTP/基本请求方式' },
         { text: 'Axios 封装', link: '/HTTP/封装axios' },
         { text: 'websocket 封装', link: '/HTTP/封装websocket.md' },
-        { text: 'socket.io 封装', link: '/HTTP/封装SocketIO.md' }
+        { text: 'socket.io 封装', link: '/HTTP/封装SocketIO.md' },
+        { text: 'BroadcastChannel 封装', link: '/HTTP/封装BroadcastChannel' }
       ]
     }
   ]

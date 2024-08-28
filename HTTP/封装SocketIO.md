@@ -48,7 +48,7 @@ class SocketIO {
     this.socket = null
     this.errCount = 0
     this.isConnected = false
-    this.maxError = 10
+    this.maxError = 5
     this.initSocket()
   }
 
@@ -60,41 +60,38 @@ class SocketIO {
       timeout: 30000
     })
 
-    // 建立连接
+    // connect
     this.socket.on('connect', () => {
       this.isConnected = true
       this.errCount = 0
-      console.log('connect')
       setTimeout(() => {
         console.log(this.option)
         let param = ''
         let str = JSON.stringify(this.option.param)
         if (this.option.emit === 'query') {
           param = eval(`(${str})`)  // `eval()` 函数会将传入的字符串当做 JavaScript 代码进行执行
-          console.log(param)
         }
         this.socket.emit(this.option.emit, param)  // 发送消息
-      }, 100);
+      }, 200);
     })
 
-    // 连接断开
+    // disconnect
     this.socket.on('disconnect', () => {
-      console.log('disconnect')
       this.isConnected = false
     })
 
-    // 连接失败
+    // connect_error
     this.socket.on('connect_error', (error) => {
-      console.log('connect_error', error)
+      this.errback(error)
       this.errCount++
       if (this.errCount >= this.maxError) { // 连接失败次数大于或等于给定最大连接数 则断开连接
         this.socket.disconnect()
       }
     })
 
-    // 连接超时
+    // connect_timeout
     this.socket.on('connect_timeout', () => {
-      console.log('connect_timeout')
+      this.errback('connect_timeout')
       this.errCount++
       this.socket.disconnect()
       if (this.errCount >= this.maxError) { // 连接超时次数大于或等于给定最大连接数 则断开连接
@@ -102,23 +99,24 @@ class SocketIO {
       }
     })
 
-    // 连接失败
+    // error
     this.socket.on('error', (error) => {
-      console.log('error', error)
-      if (this.errback && Object.prototype.toString.call(this.errback) === '[object Function]') {
-        this.errback(error)
-      }
+      this.errback(data)
+      //if (this.errback && Object.prototype.toString.call(this.errback) === '[object Function]') {
+      //  this.errback(error)
+      //}
       this.errCount++
       if (this.errCount >= this.maxError) { // 连接失败次数大于或等于给定最大连接数 则断开连接
         this.socket.disconnect()
       }
     })
 
-    // 监听服务端返回消息
+    // message
     this.socket.on('message', (res) => {
-      if (this.callback && Object.prototype.toString.call(this.callback) === '[object Function]') {
-        this.callback(res)
-      }
+      this.callback(res)
+      //if (this.callback && Object.prototype.toString.call(this.callback) === '[object Function]') {
+      //  this.callback(res)
+      //}
     })
     
     // 监听重连事件 （可选）

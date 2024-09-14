@@ -158,3 +158,22 @@ function getSomeValue() {
   )
 }
 ```
+
+
+
+# Websocket Event回调参数
+
+下图是一个 websocket `onclose` 回调参数，该事件监听器将在 WebSocket 连接的 `readyState` 变为 `CLOSED` 时被调用：
+
+![image-20240909102602338](https://pic-liclo.oss-cn-chengdu.aliyuncs.com/img2/202409091026527.png)
+
+重要属性含义：
+
+- CloseEvent.code：服务端发送的关闭码，[点击查看已分配的状态码](https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent/code)；
+- CloseEvent.reason：返回一个 DOMString，用以表示服务器关闭连接的原因，这由服务器和子协议决定；
+- CloseEvent.wasClean：返回一个 `Boolean` 用以表示连接是否完全关闭。
+
+常见 ws 关闭码：
+
+1. 1000 ：正常关闭。
+2. 1011 ：客户端由于遇到没有预料的情况阻止其完成请求（无法处理），因此服务端断开连接。

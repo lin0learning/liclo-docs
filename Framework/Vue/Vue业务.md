@@ -1375,3 +1375,391 @@ const currentTab = ref('Home')
 const tabs = {Home, Posts, Archive}
 </script>
 ```
+
+
+
+## 23.事件叠加 Hook
+
+```ts
+import {ref} from 'vue'
+
+export const useBasicComp = () => {
+  const compInstance = ref<any>()
+  const register = (instance: any) => {
+    compInstance.value = instance
+  }
+  
+  const changeShow = () => {
+    compInstance.value?.changeShow() // custom
+  }
+  
+  return [register, {changeShow}]
+}
+```
+
+**在 JavaScript 中访问透传 Attributes：**
+
+在`<script setup>` 中使用 `useAttrs()` 来访问一个组件的所有透传 attribute：
+
+```vue
+<script setup>
+import {useAttrs} from 'vue'
+  
+const attrs = useAttrs()
+</script>
+```
+
+
+
+## 24. optionsAPI this指向
+
+箭头函数和普通函数在处理 `this` 绑定时的不同。在使用防抖函数对组件进行包裹时，两种函数类型在作为参数传递时，this的指向不同：
+
+```js
+// 防抖函数
+export function debounce(fn, delay = 300) {
+  let timeout = null;
+  return function (...args) {
+    if (timeout) {
+      clearTimeout(timeout);
+      timeout = null;
+    } else {
+      // 对第一次输入立即执行
+      fn.apply(this, args);
+    }
+    timeout = setTimeout(() => {
+      fn.apply(this, args);
+    }, delay);
+  };
+}
+```
+
+```js
+export default {
+  methods: {
+    testThis1: debounce(() => {
+      console.log(this) // undefined
+    }),
+    testThis2: debounce(function() {
+      console.log(this)  // VueInstance
+    })
+  }
+}
+```
+
+**箭头函数的 `this`**
+
+- 箭头函数不会创建自己的 `this`，而是从它定义时的上下文中继承 `this`。
+- 在 Vue 的 `Options API` 中，如果你使用箭头函数，`this` 将被固定为定义时的上下文。因此，`this` 在 `testThis1` 中是 `undefined`，因为箭头函数没有自己的 `this`，而且在当前上下文中（即在 `debounce` 函数内），`this` 是未定义的。
+
+**普通函数的 `this`**
+
+- 普通函数的 `this` 是动态的，它取决于函数的调用方式。
+- 在 `testThis2` 中使用普通函数时，`this` 的值取决于调用时的上下文。在 Vue 中，由于 `testThis2` 是作为 Vue 实例的一个方法被调用的，因此 `this` 指向 Vue 实例。
+
+
+
+## 25. 动态路由
+
+**首先在`Login`组件中，处理登录相关逻辑，并将登录信息存储到Vuex中：**
+
+```vue [Login.vue]
+<script setup>
+const onLogin = async () => {
+  await formRef.value.validateFields();
+  logining.value = true;
+  store.dispatch("user/Login", formState).then((info) => {
+    if (info) {
+      errMsg.value = info;
+      isFalse.value = true;
+      throw info
+    } else {
+      let menus = store.state.user.menus;
+      if (!menus || menus.length === 0) {
+        message.error("当前用户无角色权限，请联系管理员修改！");
+      } else {
+        store.dispatch("user/loadRoutes").then(() => {
+          router.push(`${store.state.user.menus[0].url}`);
+        });
+      }
+    }
+  }).catch((error) => {
+    throw error
+  }).finally(() => {
+    logining.value = false;
+  })
+}
+</script>
+```
+
+**Vuex 登录相关处理**
+
+::: code-group
+
+```js [index.js]
+import { createStore } from "vuex";
+import createPersistedState from "vuex-persistedstate";
+import user from "./modules/user";
+
+const store = createStore({
+  state: () => ({}),
+  mutations: {},
+  actions: {},
+  modules: {
+    user,
+  },
+  plugins: [createPersistedState()],
+});
+
+store.dispatch("user/loadRoutes");  // 刷新不丢失路由报404关键
+
+export default store;
+```
+
+```js [user.js]
+import axios from "@/utils/axios";
+import router from "@/router";
+import { mapMenus } from "@/utils/mapMenus";
+import { resetRouter } from "@/utils/resetRouter";
+import { channel } from "@/utils/common";
+
+const user = {
+  namespaced: true,  // 开启模块命名空间  store.state.user.xxx
+  state: () => ({
+    userInfo: {},
+    menus: [],
+    token: undefined,
+  }),
+  mutations: {
+    loginInfo(state, data) {
+      const { token, menus, userInfo } = data;
+      state.menus = menus;
+      state.token = token;
+      state.userInfo = userInfo;
+    },
+    logoutRemove(state) {
+      state.userInfo = {};
+      state.menus = [];
+      state.token = undefined;
+      resetRouter();
+      channel.postMessage("logout")
+      localStorage.clear();
+    },
+  },
+  actions: {
+    Login({ commit }, formState) {
+      const { username, password } = formState;
+      return new Promise((resolve, reject) => {
+        axios.post("/login", { username, password }).then((res) => {
+          if (res.success) {
+            let { token, userInfo, menus } = res.data;
+            axios.defaults.headers["Authorization"] = token;
+            commit("loginInfo", { token, userInfo, menus });
+            channel.postMessage("login")
+            resolve();
+          } else {
+            resolve(res.errMsg);
+          }
+        })
+        .catch((error) => {
+          reject(error);
+        });
+      });
+    },
+    LogOut({ commit }) {
+      return new Promise((resolve, reject) => {
+        commit("logoutRemove");
+        resolve(true);
+      });
+    },
+    async loadRoutes({ state, commit }) {
+      const userMenus = state.menus;
+      if (!userMenus || userMenus.length === 0) return;
+      const routes = mapMenus(userMenus);
+      routes.forEach((route) => router.addRoute("/", route));
+    },
+  },
+};
+
+export default user;
+```
+
+
+
+:::
+
+**相关功能函数如下：**
+
+**1. 重置路由**
+
+```js [resetRouter.js]
+import router from "@/router/index";
+
+const whiteList = ["root", "/", "login", "404"];
+
+// 重置路由
+export function resetRouter() {
+  router.getRoutes().forEach((route) => {
+    const {name} = route;
+    if (name && !whiteList.includes(name)) {
+      router.hasRoute(name) && router.removeRoute(name)
+    }
+  })
+}
+```
+
+**2. 遍历菜单生成路由**
+
+```ts [mapMenus.ts]
+interface MenuItem {
+  id: number
+  parentId: number
+  name: string
+  url: string
+  type: string
+  icon: string|null
+  orderId: number
+  component: string
+  children: MenuItem[]
+}
+
+export function mapMenus(userMenus: MenuItem[]) {
+  return userMenus.map(item => {
+    const {url, component, children} = item
+    const route = {
+      path: url,
+      component: () => import(`@/pages${component}.vue`),
+      children: [],
+      name: url.split("/")[1]
+    }
+    if (children && children.length > 0) {
+      route.children = mapMenus(children)
+    }
+    return route
+  })
+}
+```
+
+**3. BroadcastChannel**
+
+```js
+export const channel = new BroadcastChannel("my_channel")
+```
+
+
+
+在完成登录获取菜单遍历生成路由后，此时刷新页面，相关的路由信息会被重置（404），需要在项目重新加载时执行相关菜单处理逻辑。在导出store之前执行`store.dispatch("user/loadRoutes")`，这样在刷新页面时，`main.js`在执行`use`时会重新加载路由：
+
+```js [main.js]
+import store from './store'
+
+const app = createApp(App);
+app.use(store).use(router).use(Antd).mount("#app");
+```
+
+
+
+**导航守卫**
+
+在`main.js`中引入该文件(`permission.js`)进行导航守卫，并加载nProgress动画：
+
+```js [permission.js]
+import router from "@/router";
+import store from "@/store";
+import nProgress from "nprogress";
+import "nprogress/nprogress.css";
+
+nProgress.configure({ showSpinner: false });
+
+const whiteList = ["/login"];
+
+router.beforeEach((to, from, next) => {
+  nProgress.start();
+  let token = store.state.user.token;
+  let menus = store.state.user.menus;
+
+  if (token) {
+    // has token
+    if (to.path === "/login") {
+      next({ path: `${menus[0].url}` });
+    } else {
+      next();
+    }
+  } else {
+    // no token
+    if (whiteList.indexOf(to.path) !== -1) {
+      next();
+    } else {
+      next(`/login?redirect=${encodeURIComponent(to.fullPath)}`);
+    }
+  }
+});
+
+router.afterEach(() => {
+  nProgress.done();
+});
+```
+
+
+
+
+
+**Header组件退出登录**
+
+Header组件进行退出登录操作时，需要清除用户信息和路由菜单缓存，并重定向到login页面，此时如果有多Tab页同时登录的情况，在A页面退出登录后，B页面仍可进行路由切换。处理方法有很多，根据各自的项目需求，我采用`BroadcastChannel`来监听登录和登出，在监听的回调函数中，使用`location.reload`来重载页面（清除缓存、路由菜单）。
+
+```js
+// 修改密码
+const editPwd = async () => {
+  await formRef.value.validateFields();
+  try {
+    let res = await editPwdAPI(password)
+    if (res.success) {
+      store.dispatch('user/LogOut').then(res => {
+        router.push('/login')
+      })
+    }
+  }
+}
+
+// 登出
+const logout = () => {
+  Modal.confirm({
+    title: "系统提示",
+    icon: createVNode(ExclamationCircleOutlined),
+    content: "确定注销并退出系统？",
+    okText: "确定",
+    okType: "primary",
+    cancelText: "取消",
+    closable: true,
+    maskClosable: true,
+    async onOk() {
+      store.dispatch("user/LogOut").then((res) => {
+        router.push("/login");
+      });
+    },
+    onCancel() {},
+  });
+};
+```
+
+**App组件监听退出**
+
+```js
+import { channel } from "@/utils/common";
+
+channel.addEventListener("message", e => channelEvent(e))
+/**
+ * @param {MessageEvent<any>} e 
+ */
+function channelEvent(e) {
+  const data = e.data;
+  let actions = ["login", "logout"];
+  if (actions.includes(data)) {
+    location.reload();
+  }
+}
+```
+
+
+

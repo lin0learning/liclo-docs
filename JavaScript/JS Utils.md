@@ -1,6 +1,7 @@
 # Javascript 工具函数
 
 **1. 创建 svg 元素**
+
 ```js
 /**
  * 创建svg tag
@@ -401,5 +402,104 @@ const sortedList = computed(() => {
     return orderMap[a.deviceTypeName] - orderMap[b.deviceTypeName]
   })
 })
+```
+
+**传入字符串/数字数组生成对象索引Map：**
+
+```ts
+type Item = string | number | symbol
+function ArrayToMap(arr: Item[]) {
+  return arr.reduce((prev, cur, index) => {
+    prev[cur] = index
+    return prev
+  }, {})
+}
+```
+
+
+
+
+
+
+
+**19. 对象数组按照指定键名进行去重**
+
+```ts
+function deduplicateArray<T>(arr: T[], key: keyof T) {
+  if (!Array.isArray(arr) || arr.length === 0) return []
+
+  if (typeof key !== 'string' || !(key in arr[0])) return arr // 如果 key 不是对象的属性，则返回原数组
+  
+  // 使用 Map 数据结构来根据 `key` 属性值去重
+  const uniqueMap = new Map<any, T>()
+
+  arr.forEach(item => {
+    const keyValue = item[key]
+    if (!uniqueMap.has(keyValue)) {
+      uniqueMap.set(keyValue, item)
+    }
+  })
+
+  return Array.from(uniqueMap.values())
+}
+```
+
+```js
+function unique(arr) {
+  const res = []
+  const map = new Map()
+  for (let item of arr) {
+    if (!map.has(item.name)) {
+      map.set(item.name)
+      res.push(item)
+    }
+  }
+  return res
+}
+```
+
+
+
+**20. 大小单位转换**
+
+```js
+function formatSizeUnits(kb) {
+  let units = ['KB', 'MB', 'GB', 'TB', 'PB']
+  let unitIndex = 0
+  
+  while(kb >= 1024 && unitIndex < units.length - 1) {
+    kb /= 1024
+    unitIndex++
+  }
+  
+  return `${kb.toFixed(2)} ${units[unitIndex]}`
+}
+```
+
+
+
+**21. 将对象的key大写**
+
+```ts
+function transformKeys(obj, ignoreKeys = []) { //需补充ts类型
+  const newObj = {}
+  
+  for (const key in obj) {
+    if (obj.hasOwnProperty(key)) {
+      if (ignoreKeys.includes(key)) {
+        newObj[key] = obj[key]
+      } else {
+        const newKey = capitalizeFirstLetter(key)
+        newObj[newKey] = obj[key]
+      }
+    }
+  }
+  return newObj
+}
+
+
+function capitalizeFirstLetter(str:string) {
+  return str.charAt(0).toUpperCase() + str.slice(1)
+}
 ```
 

@@ -236,6 +236,44 @@ function fetchVideo() {
 controller?.abort()
 ```
 
+### 3. 项目应用
+
+在Vue3.5+项目中，我们可以使用 `onWatcherCleanup()` API 来注册一个清理函数，当侦听器失效并准备重新运行时会被调用，并取消请求（副作用清理）：
+
+```js{9-12}
+import {watch, onWatcherCleanup} from 'vue'
+
+watch(id, (newId) => {
+  const controller = new AbortController()
+  
+  fetch(`/api/${newId}`, {signal: controller.signal}).then(() => {
+    // ...
+  })
+  onWatcherCleanup(() => {
+    // 终止过期请求
+    controller.abort()
+  })
+})
+```
+
+请注意，onWatcherCleanup 仅在 Vue 3.5+ 中支持，并且必须在 watchEffect 效果函数或 watch 回调函数的同步执行期间调用：不能在异步函数的 await 语句之后调用它。
+
+作为替代，onCleanup 函数还作为第三个参数传递给侦听器回调，以及 watchEffect 作用函数的第一个参数：
+```js
+watch(id, (newId, oldId, onCleanup) => {
+  // ...
+  onCleanup(() => {
+    // 清理逻辑
+  })
+})
+
+watchEffect((onCleanup) => {
+  // ...
+  onCleanup(() => {
+    // 清理逻辑
+  })
+})
+```
 
 
 ##  Axios 拦截器实现原理

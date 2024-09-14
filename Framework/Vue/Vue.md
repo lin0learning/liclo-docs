@@ -993,7 +993,78 @@ const title = defineModel('title')
 
 
 
+### 侦听器
 
+#### Watch
+
+在组合式 API 中，可以使用 `watch`函数在每次响应式状态发生变化时触发回调函数
+
+`watch` 的第一个参数可以是不同形式的“数据源”：它可以是一个 ref (包括计算属性)、一个响应式对象、一个 [getter 函数](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Functions/get#description)、或多个数据源组成的数组：
+
+```js
+const x = ref(0)
+const y = ref(0)
+
+// 单个 ref
+watch(x, (newVal) => {
+  // ...
+})
+
+// getter函数
+watch(
+  () => x.value,
+  (val) => { /**/ }
+)
+```
+
+注意，不能直接侦听响应式对象的属性值，例如：
+
+```js
+const obj = reactive({ count: 0 })
+const props = defineProps({
+  id: String
+})
+// 错误，以下 watch() 得到的参数是一个值，需要用一个返回该属性的 getter 函数。
+watch(obj.count, (count) => {
+  // ... 
+})
+watch(props.id, (id) => {
+  /// ...
+})
+```
+
+
+
+#### WatchEffect
+
+下面的代码，在每当 `todoId` 的引用发生变化时使用侦听器来加载一个远程资源：
+
+```js
+const todoId = ref(1)
+watch(
+  todoId, 
+  async () => {
+    const res = awaif fetch(`http://xxx.com/todos/${todoId.value}`)
+    let data = await res.json()
+  },
+  {immediate: true}
+)
+```
+
+注意侦听器两次使用了 `todoId` ，一次是作为源，另一次是在回调中。
+
+可以使用 `WatchEffect` 函数来简化上面的代码。`watchEffect()` 允许我们自动跟踪回调的响应式依赖。上面的侦听器可以重写为：
+
+```js
+watchEffect(async () => {
+  const response = await fetch(
+    `https://jsonplaceholder.typicode.com/todos/${todoId.value}`
+  )
+  data.value = await response.json()
+})
+```
+
+这个例子中，回调会立即执行，不需要指定 `immediate: true`。在执行期间，它会自动追踪 `todoId.value` 作为依赖（和计算属性类似）。每当 `todoId.value` 变化时，回调会再次执行。有了 `watchEffect()`，我们不再需要明确传递 `todoId` 作为源值。
 
 
 

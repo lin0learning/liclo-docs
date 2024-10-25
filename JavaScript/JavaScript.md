@@ -1434,6 +1434,70 @@ function copyProperties(target, source) {
 
 
 
+## 35. 不同编码格式的空格
+
+1. `\u00a0`，unicode编码，用 `\r \n`等方式无法替换空格，可通过以下方法替换：
+
+   ```js
+   dest = dest.replaceAll("[\\pZ]", "")
+   ```
+
+   以下参考：
+
+   ```markdown
+   \pP 小写 p 表示 property，表示 Unicode 属性，用于 Unicode 表达式的前缀。
+   大写 P 表示 Unicode 字符集七个字符属性之一：标点字符。
+   L：字母；
+   M：标记符号；
+   Z：分隔符（比如空格、换行等）；
+   S：符号（比如数学符号、货币符号等）；
+   N：数字（比如阿拉伯数字、罗马数字等）
+   ```
+
+2. `u00A0`，不间断空格。主要 用在 office 中，让一个单词在结尾处不会换行显示，快捷键ctrl+shift+space；
+
+3. `\u0020`，半角空格（英文符号），代码中常用；
+
+4. `\u3000`，全角空格，中文文章中使用；
+
+5. 其他
+
+   - `\n`回车(`\u00a`)
+   - `\t`水平制表符(`\u0009`)
+   - `\s`空格(`\u0008`)
+   - `\r`换行(`\u000d`)
+
+```js
+let reg = /\\pz*\\s*|\t|\r|\n/
+```
+
+
+
+## 36. 数组的交集、并集、差集
+
+```js
+// 并集
+function union(arr1, arr2) {
+  return Array.from(new Set([...arr1, ...arr2]))
+}
+
+// 交集
+function cross(arr1, arr2) {
+  return Array.from(new Set(arr1.filter(item => arr2.includes(item))))
+}
+
+// 差集
+function diff(arr1, arr2) {
+  const union = Array.from(new Set([...arr1, ...arr2]))
+  const cross = Array.from(new Set(arr1.filter(item => arr2.includes(item))))
+  return Array.from(new Set(union.filter(item => !cross.includes(item))))
+}
+```
+
+
+
+
+
 
 
 ## 链接

@@ -1,4 +1,6 @@
-# Javascript 工具函数
+# JavaScript Utils
+
+## JavaScript 工具函数
 
 **1. 创建 svg 元素**
 
@@ -503,3 +505,131 @@ function capitalizeFirstLetter(str:string) {
 }
 ```
 
+
+
+## JavaScript 数据处理
+
+**1. 对象数组按照指定键名进行去重**
+
+```js
+let alarmList = [
+  {
+    key: 260012,
+    value: 260012,
+    title: 'CPU占用过高',
+    deviceTypeId: 2,
+    checked: false
+  }
+]
+
+// 按照键名`key`进行去重
+const uniqueAlarmList = Array.from(
+  alarmList.reduce((map, item) => {
+    if (!map.has(item.key)) {
+      map.set(item.key, item)
+    }
+    return map
+  }, new Map()).values()
+)
+```
+
+
+
+**2. 数组A与数组B值对应，同步进行过滤**
+
+```js
+const alarmIds = [1,2,3,4,5]
+const alarmTitles = ['Alarm 1', 'Alarm 2','Alarm 3','Alarm 4','Alarm 5']
+const alarmList = [
+  {key: 2, name: 'Alarm 2'},
+  {key: 4, name: 'Alarm 4'}
+]
+
+// 提取 alarmList 中的 key 值数组
+const validKeys = alarmList.map(alarm => alarm.key)
+
+// 过滤 alarmIds 和 alarmTitles
+const filterArr = alarmIds
+	.map((id, index) => {
+    if (validKeys.includes(id)) {
+      return {id, title: alarmTitles[index]}
+    }
+    return null
+  })
+	.filter(item => item !== null)
+
+// 将过滤结果分解
+filterArr.map(item => item.id) // [2,4]
+filterArr.map(item => item.title) // ['Alarm 2', 'Alarm 4']
+```
+
+
+
+**3. Vue2 mixin 事件传递**
+
+::: code-group
+
+```vue [Main.vue]
+<script>
+import mixin from './mixin'
+export default {
+  name: 'alarm-parameter-set',
+  mixins: [mixin],
+  mounted() {
+    this.$on("vitrual-check-change", (...params) => {
+      // ...
+    })
+  }
+}
+</script>
+```
+
+```vue [Item.vue]
+<script>
+import mixin from './mixin'
+export default {
+  mixins: [mixin],
+  props: {
+    source: {
+      type: Object,
+      default: () => {}
+    }
+  }
+  methods: {
+    onChange(e) {
+      this.dispatch(
+        'alarm-parameter-set',
+        'virtual-check-change',
+        this.source.value,
+        this.source.title,
+        e.target.checked
+      )
+    }
+  }
+}
+</script>
+```
+
+```js [mixin.js]
+export default {
+  methods: {
+    dispatch(componentName, eventName, ...rest) {
+      let parent = this.$parent || this.$root
+      let name = parent.$options.name
+      
+      while (parent && (!name || name !== componentName)) {
+        parent = parent.$parent
+        if (parent) name = parent.$options.name
+      }
+      
+      if (parent) {
+        parent.$emit.apply(parent, [eventName].concat(rest))
+      }
+    }
+  }
+}
+```
+
+
+
+:::

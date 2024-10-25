@@ -1763,3 +1763,54 @@ function channelEvent(e) {
 
 
 
+## 26. 全局 loading
+
+创建一个全局变量`loading`，通过该变量设置页面loading状态
+
+```ts
+import {ref, computed} from 'vue'
+
+const _loadingCount = ref(0)
+
+export const loading = computed({
+  get() {
+    return _loadingCount.value > 0
+  },
+  set(val) {
+    _loadingCount.value += val ? 1 : -1
+    _loadingCount.value = Math.max(0, _loadingCount.value)
+  }
+})
+```
+
+在公共请求方法中，根据请求改变loading状态
+
+```ts
+import {loading} from '@/loading'
+
+export async function request(url:string, ...params: any[]) {
+  try {
+    loading.value = true
+    return await yourRequestFn(url)
+  } finally {
+    loading.value = false
+  }
+}
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

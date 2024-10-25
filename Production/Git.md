@@ -525,3 +525,30 @@ cat id_rsa.pub
 |----github.yml
 ```
 
+
+
+## Submoudle
+
+Git Submodule 允许我们将一个 Git 仓库作为另一个 Git 仓库的子模块进行管理。
+
+### 1. 创建 Submodule
+
+首先初始化主项目仓库
+
+```bash
+git init <your-project-name>
+```
+
+然后，使用 `git submodule add` 命令添加子模块
+
+```bash
+git submodule add <子模块 URL> <子模块路径>
+```
+
+例如：
+
+```bash
+git submodule add http://192.168.15.0:9090/config/config.git config 
+```
+
+最后，提交添加子模块的变更。

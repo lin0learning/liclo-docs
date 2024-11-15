@@ -10,6 +10,20 @@
  * @param {'svg'|'g'|'path'|'filter'|'animate'|'marker'|'line'|'polyline'|'rect'|'circle'|'ellipse'|'polygon'|'text'} tagName 
  * @param {import('vue').SVGAttributes} [attrs] 
  * @returns {Element}
+ * @example
+ * ```js
+ * let rect = createTag('rect', {
+ *  x: 0,
+ *  y: 0,
+ *  width: '8',
+ *  height: '8',
+ *  stroke: '#26c7ff',
+ *  'stroke-width': '2',
+ *  rx: '2',
+ *  ry: '2'
+ * })
+ * svg.appendChild(rect)
+ * ```
  */
 export function createTag(tagName, attrs) {
   let svgTags = ['svg', 'g', 'path', 'filter', 'animate', 'marker', 'line', 'polyline', 'rect', 'circle', 'ellipse', 'polygon', 'text'];
@@ -504,6 +518,44 @@ function capitalizeFirstLetter(str:string) {
   return str.charAt(0).toUpperCase() + str.slice(1)
 }
 ```
+
+
+
+**22. 深拷贝**
+
+```js
+/**
+ * 深拷贝
+ * @template T
+ * @param {T} obj 
+ * @param {*} map 
+ * @returns {T}
+ */
+export function deepClone(obj, map = new WeakMap()) {
+  if (obj === null || typeof obj !== 'object') return obj;
+  
+  if (map.has(obj)) return map.get(obj);
+  
+  if (obj instanceof Date) return new Date(obj);
+  if (obj instanceof RegExp) return new RegExp(obj);
+  if (obj instanceof Map) return new Map(Array.from(obj, ([key, val]) => [deepClone(key), deepClone(val)]));
+  if (obj instanceof Set) return new Set(Array.from(obj, (val) => deepClone(val)));
+  
+  const objClone = Array.isArray(obj) ? [] : {};
+  
+  map.set(obj, objClone);
+  
+  for (let key in obj) {
+    if (Object.prototype.hasOwnProperty.call(obj, key)) {
+      objClone[key] = deepClone(obj[key], map);
+    }
+  }
+  
+  return objClone;
+}
+```
+
+
 
 
 

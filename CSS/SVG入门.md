@@ -3,6 +3,7 @@
 可缩放矢量图形（Scalable Vector Graphics，SVG）基于 XML 标记语言，用于描述二维的矢量图形。
 
 ## SVG 和 Canvas 的区别
+
 - 可扩展性：
   - SVG 基于矢量的点、线、形状和数学公式来构建图形，没有像素，放大和缩放时不会失真；
   - Canvas 由多个像素点构成图形，放大会使图形变得颗粒状和像素化；
@@ -129,7 +130,7 @@ export function createTag(tagName, attrs) {
 2. css `background-image` 属性引入（不支持交互）
 3. HTML 文件引用 svg 源文件（支持交互）
 
-
+  
 
 ## SVG Grid 和坐标系
 - `<svg>` 元素默认宽度为 300px，高为 150px
@@ -137,7 +138,7 @@ export function createTag(tagName, attrs) {
 `viewport` 视口 与 `viewBox` 视图框
 - viewport 是 SVG 画布的大小，而 viewBox 是用来定义用户坐标系中的位置和尺寸
 
-
+## SVG 元素
 
 **SVG的基本形状**
 
@@ -216,11 +217,65 @@ SVG 路径（path）
   - M moveTo
   - Z close Path 闭合路径（没有则不闭合）
   - L lineTo （可省略）
-- 
+
+
+
+SVG 文字
+
+`<text>`、`<tspan>`
+
+`<text>`元素的基本属性
+
+- x 和 y 属性决定文本在坐标系中显示的位置
+- text-anchor 文本流方向属性
+- dominant-baseline
+
+tspan 用于标记大块文字的字部分，它必须是一个text元素或者别的tspan元素的子元素。
+
+
+
+元素组合 `<g>`
+
+- g 元素用来组合元素，添加到g 元素上的变换会应用到其所有的子元素上。
+- 核心属性：id
+
+元素复用`<defs>`
+
+- 把可复用的元素定义在`<defs>`元素中，通过`<use>`元素来引用和显示。
+- `<use>` 等同于深度克隆DOM节点，其`weight/height`属性在引入svg或symbol元素时才会生效。
+
+```html
+<svg width="300" height="300" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="theGradient" x1="0" y1="0" x2="100" y2="100" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#52c41a" />
+      <stop offset="50%" stop-color="#13c2c2" />
+      <stop offset="1" stop-color="#1677ff" />
+    </linearGradient>
+    <line id="theLine" x1="10" y1="10" x2="120" y2="120" stroke="#2f54eb"></line>
+  </defs>
+  <circle cx="50" cy="50" r="40" fill="url('#theGradient')"></circle>
+  <use href="#theLine"></use>
+</svg>
+```
+
+在其他svg标签下也能复用`<defs>`中的元素。通常对专门用于定义复用图形的`svg`标签，又没有参与其他功能的情况下会将其隐藏。
+
+
+
+图形元素复用`<symbol>`
+
+该元素和defs元素类型，用于定义可复用元素，然后通过`<use>`元素来引用显示。
+
+- symbol元素中定义的图形元素默认不会显示在界面上
+- 常用于定义各种小图标
+
+
 
 
 
 ## 业务功能
+
 1. svg 元素沿自身旋转（上下颠倒）
 ```css
 .tag {

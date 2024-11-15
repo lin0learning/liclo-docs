@@ -573,7 +573,7 @@ Array.from(allATags).map(item => item.getAttribute("href"))
 
 ## 16. 防抖 & 节流
 
-### **防抖 ** - debounce
+### **防抖** - debounce
 
 ```typescript
 /**
@@ -1495,6 +1495,60 @@ function diff(arr1, arr2) {
 ```
 
 
+
+## 37. JS 精度丢失
+
+JavaScript 使用的是 IEEE 754 双精度浮点数（64位）来表示数组，进行数学运算时可能会导致精度问题。浮点数无法精确地表示某些小数，在进行数学运算时会出现精度丢失，特别是对于小数运算：
+
+```js
+0.1 + 0.2   // 0.30000000000000004
+0.7 + 0.1   // 0.7999999999999999
+0.2 + 0.4   // 0.6000000000000001
+0.3 - 0.2   // 0.0999999999999998
+19.99 * 100 // 1998.9999999999998
+0.8 * 3     // 2.400000000000004
+0.3 / 0.1   // 2.999999999999996
+```
+
+IEEE 754 双精度浮点数使用 64 位表示，其中包括 1 位 符号位、11 位指数位和 52 位尾数位。对于某些十进制小数，无法精确表示，例如：
+
+- 十进制的`0.1`和`0.2`在二进制中是无限循环的数，不能精确表示。
+
+解决方法
+
+1. 使用整数进行运算
+
+   - 如果可能，将小数乘以 `10` 的倍数进行计算，最后再除以响应倍数
+
+   ```js
+   let res = (0.1 * 10 + 0.2 * 10) / 10 // 0.3
+   ```
+
+2. 使用`toFixed()`或`toPrecision()`函数
+   `toFixed()`仅适用于显示，不适合后续计算
+
+   ```js
+   let result = (0.1 + 0.2).toFixed(2)  // "0.30"
+   ```
+
+3. 使用大数库
+   在专用需求场景下， 可以使用专门的大数库，例如 [decimal.js](https://github.com/MikeMcl/decimal.js/) 或 [bignumber.js](https://github.com/MikeMcl/bignumber.js/)。
+
+
+
+## 38. requestAnimationFrame
+
+```js
+window.requestAnimationFrame(draw)
+function draw() {
+  //...
+  window.requestAnimationFrame(draw)
+}
+```
+
+与`setTimeout`或`setInterval`相比，绘制动画更加流畅、不卡顿。
+
+浏览器切换至后台运行时，会暂停绘制，性能更好。
 
 
 

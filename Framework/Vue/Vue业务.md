@@ -841,6 +841,35 @@ onUnmounted(() => {
 
 :::
 
+当`option`发生更新时，调用`setOption()`的优化方式：
+
+```js
+export default {
+  watch: {
+    handler(val) {
+      this.$nextTick(() => {
+        let dom = document.getElementById(this.id)
+        if (!dom) return
+        let myChart = this.$echarts.getInstanceByDom(dom)
+        if (!myChart) {
+          myChart = this.$echarts.init(dom)
+        } else {
+          myChart.dispose()
+          myChart = this.$echarts.init(dom)
+        }
+        myChart && myChart.resize()
+        myChart.clear()
+        myChart.setOption(this.option)
+      })
+    },
+    deep: true,
+    immediate: true
+  }
+}
+```
+
+
+
 ## 17. 获取组件实例方法
 期望使用 `ref()` 来获取组件实例的同时时，获得其组件实例的属性。
 **封装 `useCompRef`**

@@ -4,7 +4,8 @@
     "module": "ESNext",
     "moduleResolution": "Node",
     "jsx": "preserve",
-    "baseUrl": "."
+    "baseUrl": ".",
+    "resolveJsonModule": true
   },
   "include": [".vitepress/**/*.ts", ".vitepress/components/*.vue"],
   "exclude": ["node_modules"]

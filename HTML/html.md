@@ -296,8 +296,8 @@ window.addEventListener("beforeunload", function(e) {
 
 preload、prefetch以及dns-prefetch的区别：
 
-- preload表示资源在当前页面使用时，浏览器会**优先**加载；
-- prefetch表示资源可能在**未来的页面**（如通过链接打开下一个页面）使用，浏览器将会在空闲时预加载
+- preload表示资源在当前页面使用时，浏览器会<font color="red">**优先加载**</font>；
+- prefetch表示资源可能在**未来的页面**（如通过链接打开下一个页面）使用，浏览器将会在<font color="red">空闲时预加载</font>；
 - **`DNS-prefetch`** (**DNS 预获取**) 是尝试在请求资源之前解析域名。这可能是后面要加载的文件，也可能是用户尝试打开的链接目标。
 
 当浏览器从（第三方）服务器请求资源时，必须先将该[跨域](https://developer.mozilla.org/zh-CN/docs/Web/HTTP/CORS)域名解析为 IP 地址，然后浏览器才能发出请求。此过程称为 DNS 解析。DNS 缓存可以帮助减少此延迟，而 DNS 解析可以导致请求增加明显的延迟。对于打开了与许多第三方的连接的网站，此延迟可能会大大降低加载性能。
@@ -530,3 +530,69 @@ let lineLeft = createTag('line', {
 ```
 
 实践：![image-20240529113428900](https://pic-liclo.oss-cn-chengdu.aliyuncs.com/img2/202405291135780.png)
+
+
+
+## 19. 嵌套iframe页面通信
+
+**方式一：URL Params**
+
+通过对iframe页面的`src`属性添加url参数进行数据传递：
+
+```vue
+<template :src="stationMapUrl"></template>
+
+<script setup>
+const stationMapUrl = computed(() => {
+  let str = ""
+  let index = 1
+  for (let key in route.query) {
+    str += ((index++ === 1 ? "?" : "&") + key + "=" + route.query[key])
+  }
+  return window.iframeUrl + "/#/data-board" + str
+})
+</script>
+```
+
+iframe界面中接收：
+
+```typescript
+let page = getParameterByName('page')
+
+function getParameterByName(name: string) {
+  const searchParams = new URLSearchParams(window.location.search)
+  return searchParams.get(name)
+}
+```
+
+
+
+**方式二：window.postMessage**
+
+使用`postMessage`适用于非跨域与跨域场景：
+
+:::code-group
+
+```js [main]
+onMounted(() => {
+  let iframe = document.getElementById('data-iframe')
+  
+  let userObj = JSON.parse(JSON.stringify(store.state.userObj))
+  
+  iframe.onload = function() {
+    // targetOrigin 应为具体窗口的URI，而不应为"*"（无限制），后者可能会被劫持。
+    iframe.contentWindow.postMessage({userObj}, "targetOrigin")
+  }
+})
+```
+
+```js [iframe]
+window.addEventListener('message', (msg) => {
+  const {userObj} = msg.data
+  // ...
+})
+```
+
+
+
+:::

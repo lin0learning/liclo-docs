@@ -58,6 +58,7 @@
 光标快速移动到行尾 - 键盘快捷方式-cursorLineEnd - `Ctrl` + `;`
 
 ## JSconfig
+
 **`jsconfig.json`**
 ```json
 {

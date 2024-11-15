@@ -298,6 +298,50 @@ type KeyT = keyof any
 
 对于没有自定义键名的类型使用 keyof 运算符，返回 `never` 类型。
 
+```typescript
+type keyT = keyof object // never
+```
+
+对于联合类型，keyof 返回成员共有的键名。
+
+```typescript
+type A = {a: string, z: boolean}
+type B = {b:string, z: boolean}
+
+type keyT = keyof (A | B) // 'z'
+```
+
+对于交叉类型，keyof 返回所有键名。
+
+```typescript
+type A = { a: string; x: boolean };
+type B = { b: string; y: number };
+
+type KeyT = keyof (A & B); // 'a' | 'x' | 'b' | 'y'
+```
+
+keyof 取出的是以键名组成的联合类型，如果想取出键值组成的联合类型，可以这样：
+
+```typescript
+type MyObj = {
+  foo: number
+  bar: string
+}
+
+type Keys = keyof MyObj
+type Values = MyObj[Keys] // number|string
+```
+
+用途：
+
+对于取出对象的某个指定属性的值，TS可精确表达返回值类型：
+
+```typescript
+function prop<T，K extends keyof T>(obj: T, key: K):T[K] {
+  return obj[key]
+}
+```
+
 
 
 ### 2. in
@@ -314,6 +358,8 @@ if ('a' in obj) console.log('found a')
 ![img](https://cdn.nlark.com/yuque/0/2024/png/274425/1710000442468-2bac5715-31b6-4deb-97ab-cf21658c014c.png)
 
 ```typescript
+type AnimalKind = 'dog' | 'cat' | 'bird'
+
 type AnimalCounts = {
   [key in AnimalKind]: number
 }
@@ -401,6 +447,29 @@ type Awaited<T> = T extends Promise<infer R> ? R : T
 type Atype = Awaited<Promise<number>> // number
 ```
 
+返回函数的Promise版本 **ReturnPromise**
+
+```typescript
+type ReturnPromise<T> = T extends (...args: infer A) => infer R
+  ? (...args: A) => Promise<R>
+  : T
+```
+
+获取对象指定属性的类型
+
+```typescript
+type MyType<T> = T extends {
+  a: infer M
+  b: infer N
+}
+  ? [M, N]
+  : never
+
+type T = MyType<{a:string; b:number}>  // [string, number]
+```
+
+
+
 
 
 **通过 infer 遍历 元组**
@@ -411,10 +480,15 @@ type TraverseTuple<T extends any[]> = T extends [infer F, ...infer R]
   : [];
 ```
 
-**通过 infer 遍历字符串**
+**通过 infer 遍历字符串类型**
 
 ```ts
 T extends `${F}${R}`
+
+// 距离
+type Str = "foo-bar"
+
+type Bar = Str extends `foo-${infer R}` ? R : never // 'bar'
 ```
 
 
@@ -434,7 +508,23 @@ typeof 类型检查
 - symbol
 - undefined
 
+### 7. is
 
+函数返回布尔值时，可以使用`is`运算符，限定返回值与参数之间的关系。
+
+`is`运算符用来描述返回值属于`true`还是`false`
+
+```typescript
+type A = {a: string}
+type B = {b: string}
+
+function isTypeA(x: A | B): x is A {
+  if ("a" in x) return true
+  return false
+}
+```
+
+上面示例中，返回值类型 `x is A`可以准确描述函数体内部的运算逻辑。
 
 
 
@@ -591,6 +681,32 @@ const config = {
    - `Parameters<T>`
 
 利用 `infer` 关键字，可以从正在比较的类型中推断类型，然后在 true 分支里引用该推断结果。
+
+实现：
+
+```typescript
+type MyPartial<T> = {[P in keyof T]?: T[P] | undefined}
+
+type MyRequired<T> = {[P in keyof T]-?: T[P]}
+
+type MyPick<T, K extends keyof T> = { [P in K]: T[P]}
+
+type MyRecord<K extends keyof any, T> = {[P in K]: T}
+
+type MyReadonly<T> = {readonly [P in keyof T]: T[P]}
+
+type MyExclude<T, U> = T extends U ? never : T
+
+type MyExtract<T, U> = T extends U ? T : never
+
+type MyNonNullable<T> = T & {}
+
+type MyReturnType<T extends (...args: any) => any> = T extends (...args: any) => infer R ? R : any
+
+type MyParameters<T extends (...args: any) => any> = T extends (...args: infer R) => any ? R : any
+```
+
+
 
 
 
@@ -1108,5 +1224,61 @@ type Colors = typeof colors[number]  // "a" | "b" | "c"
    type Array2Union<T extends readonly any[]> = T[number]
    ```
 
-   
+
+
+
+
+
+## 从字段到函数的推导
+
+以下 `watch` 函数，使用方式为：
+
+```js
+const personWatcher = watch({
+  name: 'Edward',
+  age: 26,
+  sex: '男'
+})
+
+personWatcher.on('ageChanged', (val, oldVal) => {})
+```
+
+不关注与函数的具体实现，使用 TS 完善其类型：
+
+```typescript
+type Watcher<T> = {
+  on<K extends keyof T & string>(
+    eventName: `${K}Changed`,
+    handler: (newVal: T[K], oldVal: T[K]) => void
+  ): void
+}
+
+declare function watch<T>(obj: T): Watcher<T>
+```
+
+
+
+## declare 关键字
+
+> declare 关键字用来告诉编译器，某个类型是存在的，可以在当前文件（项目）中使用。
+>
+> 举例，当引入外部库定义的函数而缺少类型说明时，可以使用 `declare` 关键字，手动编写外部函数的类型，这样就不会因为类型缺失而导致TS报错。
+
+declare 关键字可以描述一下类型：
+
+- 变量（const、let、var）
+- type 或者 interface 命令声明的类型
+- class
+- enum
+- 函数（function）
+- 模块（module）
+- 命名空间（namespace）
+
+declare 只能用来描述已经存在的变量和数据结构，不能用来声明新的变量和数据结构。另外，所有 declare 语句都不会出现在编译后的文件里面。
+
+```typescript
+declare function satHello(name: string): void
+```
+
+
 

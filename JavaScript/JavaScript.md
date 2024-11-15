@@ -1536,6 +1536,22 @@ IEEE 754 双精度浮点数使用 64 位表示，其中包括 1 位 符号位、
 
 
 
+## 38. requestAnimationFrame
+
+```js
+window.requestAnimationFrame(draw)
+function draw() {
+  //...
+  window.requestAnimationFrame(draw)
+}
+```
+
+与`setTimeout`或`setInterval`相比，绘制动画更加流畅、不卡顿。
+
+浏览器切换至后台运行时，会暂停绘制，性能更好。
+
+
+
 
 
 ## 链接

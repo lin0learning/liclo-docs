@@ -348,6 +348,14 @@ const ChangeButton = () => {
 export default ChangeButton
 ```
 
+`memo` - 是一个高阶组件，用于性能优化。当组件的 props 没有变化时，React.memo 会跳过不必要的渲染，从而提高性能。
+
+> lets you skip re-rendering a component when its props are unchanged.
+>
+> ```tsx
+> const MemoizedComponent = memo(SomeComponent, arePropsEqual?)
+> ```
+
 ```tsx
 function calcTotal() {}
 

@@ -767,8 +767,6 @@ Page({
 - 获取上一级页面的Page实例，再`setData`（可能会造成数据异常）
 - 基础库<font color="red">2.7.3</font>开始支持 events 参数，可用于数据传递
 
-
-
 ```js
 // 设置事件
 wx.navigateTo({
@@ -783,6 +781,34 @@ const eventChannel = this.getOpenerEventChannel()
 eventChannel.emit('backEvent', ...args)
 eventChannel.emit('why', ...args)
 ```
+
+使用`EventChannel`传递对象类型数据：
+
+```js
+// 源页面
+wx.navigateTo({
+  url: '/pages/target',
+  events: {
+    someEvent(data) {/* your process */}
+  },
+  success: (res) => {
+    const objData = {key:'value', info:{nestedKey: 'nestedValue'}}
+    
+    // 通过 EventChannel 传递数据
+    res.eventChannel.emit("someEvent", {objData})
+  }
+})
+
+// 目标页面
+const eventChannel = this.getOpenerEventChannel()
+eventChannel.on('someEvent', (data) => {
+  /* your process */
+})
+```
+
+
+
+
 
 
 

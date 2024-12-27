@@ -557,6 +557,55 @@ export function deepClone(obj, map = new WeakMap()) {
 
 
 
+**23. 对象&数组遍历**
+
+```typescript
+/**
+* @param {Object} obj 数组&对象
+* @param {(...params: any[]) => void} callback 回调函数
+*/
+function forEachObj(obj: Object, callback: (...params: any[]) => void) {
+  if (!obj) return
+  if (Array.isArray(obj)) {
+    obj.forEach((item, index, obj) => callback(item, index, obj))
+  } else {
+    Object.keys(obj).forEach((key, index) =>{callback(obj[key], key, index, obj)})
+  }
+}
+```
+
+
+
+**24. 封装await不抛出错误 noErrorAwait**
+
+```typescript
+async function noErrorAwait(f: () => Promise<any>){
+  try {
+    const res = await f()
+    return {flag: true, data: res}
+  } catch(e){
+    return {flag: false, data:e}
+  }
+}
+```
+
+实际使用中，以下请求执行时并非按照顺序执行：
+
+```typescript
+const js = noErrorAwait(requestJS)
+const sy = noErrorAwait(requestSY)
+const yh = noErrorAwait(requestYH)
+```
+
+保证顺序执行，使用 `Generator`函数与`yield`关键字，并进行封装：
+
+```typescript
+```
+
+
+
+
+
 
 
 ## JavaScript 数据处理

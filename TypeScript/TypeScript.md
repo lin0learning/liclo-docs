@@ -224,6 +224,16 @@ function createPoint(PointClass: typeof Point, x: number, y: number): Point {
 }
 ```
 
+在JavaScript中，类只是构造函数的一种语法糖，本质上是构造函数的另一种写法。类的自身类型可以写成构造函数的形式：
+
+```typescript
+function createPoint(
+  PointClass: new (x: number, y: number) => Point
+): Point {
+  return new PointClass(x, y)
+}
+```
+
 还可以提取构造函数，定义单独的 interface：
 
 ```typescript
@@ -250,9 +260,40 @@ class A extends Dom implements VueCls {
 
 
 
+**静态成员**
+
+类的内部可以使用`static`关键字，定义静态成员。
+
+静态成员只能通过类本身使用，不能通过实例对象使用：
+
+```typescript
+class MyClass {
+  static x = 0
+  static printX() {
+    //
+  }
+}
+MyClass.x // 0
+MyClass.printX() // f
+```
+
+`static`关键字前可以使用public、private、protected 修饰符。
+
+静态私有属性也可以用 ES6语法的 `#`前缀表示：
+
+```typescript
+class MyClass {
+  static #x = 0
+}
+```
+
+
+
+
+
 **抽象类**
 
-abstract  所定义的方法，都只能描述而不能进行实现
+abstract 所定义的方法，都只能描述而不能进行实现
 
 ```typescript
 abstract class Vue {}

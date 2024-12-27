@@ -596,3 +596,10 @@ window.addEventListener('message', (msg) => {
 
 
 :::
+
+## 20. 错误收集
+
+unhandleRejection => Promise
+
+
+

@@ -34,7 +34,8 @@ const sidebar: DefaultTheme.Sidebar | undefined = {
       collapsed: false,
       items: [
         { text: 'VS Code', link: '/Other/VS Code.md' },
-        { text: 'dayjs & momentjs', link: '/Other/dayjs momentjs.md' }
+        { text: 'dayjs & momentjs', link: '/Other/dayjs momentjs.md' },
+        { text: '设计模式', link: '/Design Patterns/DesignPattern.md' }
       ]
     }
   ],

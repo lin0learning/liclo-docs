@@ -880,41 +880,6 @@ String({}) // '[object Object]'
 
 ## 23. JSDoc 文档注释
 
-```js
-/**
- * @typedef {Object} MenuItem
- * @property {number} id
- * @property {number} parentId
- * @property {string} name
- * @property {string} url
- * @property {number} type
- * @property {string|null} icon
- * @property {number} orderId
- * @property {string} component
- * @property {MenuItem[]} children
- */
-/**
- * @param {MenuItem[]} userMenus
- * @returns {Object[]}
- * @throws {Error}
- */
-export function mapMenus(userMenus) {
-  return userMenus.map((item) => {
-    const { url, component, children } = item;
-    const route = {
-      path: url,
-      component: import(`../pages${component}.vue`),
-      children: [],
-      name: url.split("/")[1]
-    };
-    if (children && children.length > 0) {
-      route.children = mapMenus(children);
-    }
-    return route;
-  });
-}
-```
-
 使用 `@typedef` 描述自定义类型，并可在后续复用：
 
 ```js
@@ -972,6 +937,66 @@ function deepClone(obj) {}
 ```
 
 
+
+使用案例：
+
+::: code-group
+
+```js [func1.js]
+/**
+ * @typedef {Object} MenuItem
+ * @property {number} id
+ * @property {number} parentId
+ * @property {string} name
+ * @property {string} url
+ * @property {number} type
+ * @property {string|null} icon
+ * @property {number} orderId
+ * @property {string} component
+ * @property {MenuItem[]} children
+ */
+/**
+ * @param {MenuItem[]} userMenus
+ * @returns {Object[]}
+ * @throws {Error}
+ */
+export function mapMenus(userMenus) {
+  return userMenus.map((item) => {
+    const { url, component, children } = item;
+    const route = {
+      path: url,
+      component: import(`../pages${component}.vue`),
+      children: [],
+      name: url.split("/")[1]
+    };
+    if (children && children.length > 0) {
+      route.children = mapMenus(children);
+    }
+    return route;
+  });
+}
+```
+
+
+
+```js [func2.js]
+/**
+ * 查询数据（索引）
+ * @typedef {Object} Obj
+ * @property {String} tableName 表名
+ * @property {Number|String} indexName 索引名
+ * @property {Number|String} deviceId 设备id
+ * @property {Number|String} target 索引值
+ * @property {() => void} success 查询成功的回调，返回查询成功的数据  
+ * @param {Obj} obj 
+ * @return {Obj} 返回查到的结果
+*/
+query_by_index({tableName, deviceId, indexName, target, success = () => {}}) {
+  // your code
+}
+```
+
+:::
 
 
 
@@ -1560,6 +1585,25 @@ function draw() {
 浏览器切换至后台运行时，会暂停绘制，性能更好。
 
 
+
+## 39. console.time 性能测试
+
+>启动一个计时器来跟踪某个操作的占用时长。每个计时器必须拥有唯一的名字。当以此计时器名字为参数调用`console.timeEnd()`时，浏览器将以毫秒为单位，输出对应计时器所经过的时间。
+
+```javascript {4,8}
+function meGraphList() {
+  let list = window.graphsConfig?.Mes | []
+	let listMap = {}
+  console.time('meGraphList')
+  list.forEach(element =>{
+    // your code
+  })
+  console.timeEnd('meGraphList')
+  return listMap
+}
+```
+
+![image-20250108141448316](https://pic-liclo.oss-cn-chengdu.aliyuncs.com/img2/202501081414428.png)
 
 
 

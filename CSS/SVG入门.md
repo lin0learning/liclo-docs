@@ -274,6 +274,30 @@ tspan 用于标记大块文字的字部分，它必须是一个text元素或者�
 
 
 
+## foreignObject
+
+SVG中的 `<foreignObject>`元素允许包含来自不同的 XML 命名空间的元素。在浏览器的上下文中，很可能是 XHTML/HTML。
+
+业务示例：
+
+```html
+<svg viewBox="0 0 22000 2000" xmlns="http://www.w3.org/2000/svg">
+  <g>
+    <foreignObject width="100" heigh="50" x="300" y="300">
+      <body xmlns="http://w3.org/1999/xhtml">
+        <p style="text-align:center;margin:0;padding:0;">
+          <span>01车</span>
+        </p>
+      </body>
+    </foreignObject>
+  </g>
+</svg>
+```
+
+
+
+
+
 ## 业务功能
 
 1. svg 元素沿自身旋转（上下颠倒）

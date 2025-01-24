@@ -359,6 +359,7 @@ Access-Control-Request-Headers: X-PRODUCT
    3. 接收数据 (HTTP 长轮询)
    4. 升级 (WebSocket)
    5. 接收数据 (HTTP 长轮询, WebSocket连接建立成功后关闭)
+2. **206**: `Partial Content`
 2. **302**：`Found`。请求的目标资源临时移动到了另一个 URI 上，服务器会在响应头的 Location 字段放上这个不同的 URI，浏览器可以使用 Location 中的 URI 进行自动重定向
 3. **304**：`Not Modified`。如果客户端发送了一个带条件的GET 请求且该请求已被允许，而文档的内容（自上次访问以来或者根据请求的条件）并没有改变，则服务器应当返回这个304状态码。简单表述：服务端执行了 `GET` 请求，但文件未变化。首次请求服务端返回`ETab`，在第二次请求后请求头携带这个`Etag`，会跟第二次的`Etag`对比。
 4. **307**：`Internal Redirect`。307 的定义实际上和  302 是一致的，唯一的区别在于：307 状态码不允许浏览器将原本为 POST 的请求重定向到 GET 请求上。

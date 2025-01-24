@@ -2,8 +2,11 @@
 
 ::: tip 发布-订阅模式
 - 发布-订阅模式是一种行为设计模式，它允许多个对象通过事件的发布和订阅来进行通信；
+
 - 在这种模式中，发布者(又称为主题)负责发布事件，而订阅者(也称为观察者)则通过订阅主题来接收这些事件；
+
 - 这种模式使得应用程序的不同部分能够松散耦合，并且可以动态地添加或删除订阅者；
+
 :::
 
 实现 `Emitter`
@@ -13,6 +16,7 @@
 - once
 
 ## 类型
+
 ```ts
 interface Instance {
   on: (event: string, callback: Function) => void
@@ -24,6 +28,7 @@ interface Instance {
 ```
 
 ## 使用 Class 类实现
+
 ```ts
 class Emitter implements Instance {
   events:  Map<string, Function[]>
@@ -34,7 +39,7 @@ class Emitter implements Instance {
   on(event: string, callback: Function) {
     if (this.events.has(event)) {
       const callbackList = this.events.get(event)
-      callbackList && callbackList.push(callbackList)
+      callbackList && callbackList.push(callback)
     } else {
       this.events.set(event, [callback])
     }

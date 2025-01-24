@@ -604,6 +604,80 @@ const yh = noErrorAwait(requestYH)
 
 
 
+**25. 按指定长度分隔数组，并返回嵌套数组**
+
+```typescript
+function splitArrayByLineLen(arr: any[], lineLen:number = 5) {
+	const result = []
+  for (let i = 0; i < arr.length; i += lineLen) {
+    result.push(arr.slice(i, i + lineLen))
+  }
+  return result
+}
+```
+
+
+
+**26. 类的多继承**
+
+```typescript
+function mix<T extends object>(...mixins: (new (...args: any[]) => object)[]): new (...args: any[]) => T {
+  class Mix {
+    constructor() {
+      for (const mixin of mixins) {
+        copyProperties(this, new mixin())
+      }
+    }
+  }
+
+  for (const mixin of mixins) {
+    copyProperties(Mix, mixin)
+    copyProperties(Mix.prototype, mixin.prototype)
+  }
+
+  return Mix as new (...args: any[]) => T
+}
+
+function copyProperties(target: {}, source: {}) {
+  const ignoreKeys: (string|symbol)[] = ['constructor', 'prototype', 'name']
+  for (const key of Reflect.ownKeys(source)) {
+    if (!ignoreKeys.includes(key)) {
+      Object.defineProperty(
+        target,
+        key,
+        Object.getOwnPropertyDescriptor(source, key)
+      )
+    }
+  }
+}
+
+// Example
+class A {
+  static staticMethod() {
+    return 'static A'
+  }
+  instanceMethodA() {
+    return 'instance A'
+  }
+}
+
+class B {
+  static staticMethod() {
+    return 'static B'
+  }
+  instanceMethodB() {
+    return 'instance B'
+  }
+}
+
+const Mixed = mix<A & B>(A, B)
+
+const mixedInstance = new Mixed()
+Mixed.staticMethod() // 'static B'
+mixedInstance.instanceMethodA() // 'instance A'
+mixedInstance.instanceMethodB() // 'instance B'
+```
+
 
 
 

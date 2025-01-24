@@ -32,8 +32,6 @@ git branch -v
 git remote add origin git@gitlab-example.com:xxx/xxxx.git
 ```
 
-
-
 切换分支
 
 ```bash
@@ -188,6 +186,33 @@ git reflog show dev-trunk-gjl
 ```
 
 ![image-20240426144833930](https://pic-liclo.oss-cn-chengdu.aliyuncs.com/img2/202404261448170.png)
+
+
+
+## Git Stash
+
+`git stash`命令会将所有未提交的修改（包括`staged`与`unstaged`）都保存起来，用于后续恢复当前工作目录。
+
+- `stash`是本地的，不会通过`git push`命令上传到`Git`服务器上；
+- 推荐给每一个`stash`加上一个`message`，用于记录版本；
+- 使用`git stash save` 取代`git stash`命令
+
+示例：
+
+```bash
+git stash save "stash the current repository"
+```
+
+常用`stash`命令：
+
+| 命令            | 说明                                            |
+| --------------- | ----------------------------------------------- |
+| git stash       | 暂存工作区修改的内容                            |
+| git stash list  | 查看工作区所有stash的列表，括号中的序号为id标识 |
+| git stash pop   | 从暂存区恢复最近一次的工作区内容                |
+| git stash apply | 恢复指定的stash到工作区                         |
+| git stash drop  | 删除最近一次的stash记录                         |
+| git stash clear | 清空暂存区的所有stash                           |
 
 
 

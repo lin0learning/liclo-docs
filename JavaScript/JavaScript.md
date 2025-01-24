@@ -4,31 +4,31 @@
 
 使用`function*`所声明的函数为`Generator`函数：
 
-```js
-function* foo(x) {
+```ts
+function* foo(x:number):Generator<number,number,number> {
   let y = 2 * (yield(x + 1))
   let z = yield(y / 3)
   return x + y + z
 }
 let it = foo(5)  // yield 6
 it.next()  			 // value: 6, done: false
-it.next(12)			 // value: done: false
-it.next(13)      // value: 42, done: false
+it.next(12)			 // value: 8, done: false
+it.next(13)      // value: 42, done: true
 ```
 
-Generator函数返回一个迭代器。
+Generator函数返回一个迭代器，`yield`关键字功能类似`return`。
 
 当执行第一次next时，传参会被忽略，并且函数暂停在 `yield(x+1)`处，所以返回5+1=6；
 
-当执行第二次next时，传入的参数`12`会被当作上一个yield表达式的返回值。如果不传参，则yield的返回值是undefined。此时`let y = 2 * 12`，所以第二个yield等于`2*12/3=8`
+当执行第二次next时，传入的参数`12`会被当作上一个yield表达式的返回值。如果不传参，则yield的返回值是undefined。此时`let y = 2 * 12`，所以第二个yield等于`2*12/3=8`。
 
-当执行第三次next时，传入的参数13会被当作上一个yield表达式的返回值，所以z=13，x=5，y=24，相加等于42。
+当执行第三次next时，传入的参数`13`会被当作上一个yield表达式的返回值，所以z=13，y=24，x=5，相加等于42。
 
 
 
 ## 2. 双冒号(::)与双感叹号(!!)
 
-**`::`**
+**双冒号`::`**
 
 在JS中，双冒号(::)通常用于处理函数绑定和方法引用，在ES6 (ECMAScript 2015)被引入，称为“函数绑定运算符”
 
@@ -47,7 +47,7 @@ getValue() // 42
 
 
 
-**`!!`**
+**双感叹号`!!`**
 
 `!!` 的作用是强制将一个值转换为布尔值，如果 `value` 是一个假值（例如空字符串、`null`、`undefined`、`0`、`NaN` 等），则转换后的布尔值为 `false`。
 
@@ -544,11 +544,13 @@ window.addEventListener('message', (e) => {
 
 **二、页面与嵌套的 iframe 消息传递**
 
+主页面传递`message`：
+
 ```js
-let iframe = document.getElementById('iframe')
+let iframe = document.getElementById('your-iframe-page')
 
 iframe.onload = function() {
-  iframe.contentWindow.postMessage({token: store.state.token}, '*')
+  iframe.contentWindow.postMessage({token: store.state.token}, 'your iframe url')
 }
 
 window.addEventListener('message', (e) => {
@@ -556,8 +558,15 @@ window.addEventListener('message', (e) => {
 })
 ```
 
+iframe页面接收`message`：
 
-
+```js
+window.addEventListener('message', (msg) =>{
+  if (msg.origin !== window.location.ancestorOrigins[0]) return
+  // data process
+})
+```
+以上数据传递方式具有较高风险，用户信息等关键数据应采用更为安全的方式进行项目共享，`window.addEventListener('message')`可能会监听多个来源的消息，包括但不限于浏览器插件、恶意代码等。
 
 
 
@@ -871,41 +880,6 @@ String({}) // '[object Object]'
 
 ## 23. JSDoc 文档注释
 
-```js
-/**
- * @typedef {Object} MenuItem
- * @property {number} id
- * @property {number} parentId
- * @property {string} name
- * @property {string} url
- * @property {number} type
- * @property {string|null} icon
- * @property {number} orderId
- * @property {string} component
- * @property {MenuItem[]} children
- */
-/**
- * @param {MenuItem[]} userMenus
- * @returns {Object[]}
- * @throws {Error}
- */
-export function mapMenus(userMenus) {
-  return userMenus.map((item) => {
-    const { url, component, children } = item;
-    const route = {
-      path: url,
-      component: import(`../pages${component}.vue`),
-      children: [],
-      name: url.split("/")[1]
-    };
-    if (children && children.length > 0) {
-      route.children = mapMenus(children);
-    }
-    return route;
-  });
-}
-```
-
 使用 `@typedef` 描述自定义类型，并可在后续复用：
 
 ```js
@@ -963,6 +937,66 @@ function deepClone(obj) {}
 ```
 
 
+
+使用案例：
+
+::: code-group
+
+```js [func1.js]
+/**
+ * @typedef {Object} MenuItem
+ * @property {number} id
+ * @property {number} parentId
+ * @property {string} name
+ * @property {string} url
+ * @property {number} type
+ * @property {string|null} icon
+ * @property {number} orderId
+ * @property {string} component
+ * @property {MenuItem[]} children
+ */
+/**
+ * @param {MenuItem[]} userMenus
+ * @returns {Object[]}
+ * @throws {Error}
+ */
+export function mapMenus(userMenus) {
+  return userMenus.map((item) => {
+    const { url, component, children } = item;
+    const route = {
+      path: url,
+      component: import(`../pages${component}.vue`),
+      children: [],
+      name: url.split("/")[1]
+    };
+    if (children && children.length > 0) {
+      route.children = mapMenus(children);
+    }
+    return route;
+  });
+}
+```
+
+
+
+```js [func2.js]
+/**
+ * 查询数据（索引）
+ * @typedef {Object} Obj
+ * @property {String} tableName 表名
+ * @property {Number|String} indexName 索引名
+ * @property {Number|String} deviceId 设备id
+ * @property {Number|String} target 索引值
+ * @property {() => void} success 查询成功的回调，返回查询成功的数据  
+ * @param {Obj} obj 
+ * @return {Obj} 返回查到的结果
+*/
+query_by_index({tableName, deviceId, indexName, target, success = () => {}}) {
+  // your code
+}
+```
+
+:::
 
 
 
@@ -1551,6 +1585,25 @@ function draw() {
 浏览器切换至后台运行时，会暂停绘制，性能更好。
 
 
+
+## 39. console.time 性能测试
+
+>启动一个计时器来跟踪某个操作的占用时长。每个计时器必须拥有唯一的名字。当以此计时器名字为参数调用`console.timeEnd()`时，浏览器将以毫秒为单位，输出对应计时器所经过的时间。
+
+```javascript {4,8}
+function meGraphList() {
+  let list = window.graphsConfig?.Mes | []
+	let listMap = {}
+  console.time('meGraphList')
+  list.forEach(element =>{
+    // your code
+  })
+  console.timeEnd('meGraphList')
+  return listMap
+}
+```
+
+![image-20250108141448316](https://pic-liclo.oss-cn-chengdu.aliyuncs.com/img2/202501081414428.png)
 
 
 

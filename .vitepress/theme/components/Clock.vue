@@ -4,7 +4,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { onMounted } from 'vue'
 
 onMounted(() => {
@@ -12,12 +12,15 @@ onMounted(() => {
 })
 
 function init() {
-  /** @type {HTMLCanvasElement} */
-  const canvasEl = document.querySelector("#clock")
+  const canvasEl: HTMLCanvasElement | null = document.querySelector("#clock")
+  if (!canvasEl)
+    return
   const ctx = canvasEl.getContext('2d')
 
   window.requestAnimationFrame(draw)
   function draw() {
+    if (!ctx)
+      return
     ctx.clearRect(0, 0, 300, 300)
     ctx.save()
 
@@ -48,7 +51,7 @@ function init() {
     for (let i = 0; i < list.length; i++) {
       let x = 100 * Math.cos(Math.PI * 2 / 12 * i)
       let y = 100 * Math.sin(Math.PI * 2 / 12 * i)
-      ctx.fillText(list[i], x, y)
+      ctx.fillText(`${list[i]}`, x, y)
     }
     ctx.restore()
 

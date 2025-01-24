@@ -557,6 +557,129 @@ export function deepClone(obj, map = new WeakMap()) {
 
 
 
+**23. 对象&数组遍历**
+
+```typescript
+/**
+* @param {Object} obj 数组&对象
+* @param {(...params: any[]) => void} callback 回调函数
+*/
+function forEachObj(obj: Object, callback: (...params: any[]) => void) {
+  if (!obj) return
+  if (Array.isArray(obj)) {
+    obj.forEach((item, index, obj) => callback(item, index, obj))
+  } else {
+    Object.keys(obj).forEach((key, index) =>{callback(obj[key], key, index, obj)})
+  }
+}
+```
+
+
+
+**24. 封装await不抛出错误 noErrorAwait**
+
+```typescript
+async function noErrorAwait(f: () => Promise<any>){
+  try {
+    const res = await f()
+    return {flag: true, data: res}
+  } catch(e){
+    return {flag: false, data:e}
+  }
+}
+```
+
+实际使用中，以下请求执行时并非按照顺序执行：
+
+```typescript
+const js = noErrorAwait(requestJS)
+const sy = noErrorAwait(requestSY)
+const yh = noErrorAwait(requestYH)
+```
+
+保证顺序执行，使用 `Generator`函数与`yield`关键字，并进行封装：
+
+```typescript
+```
+
+
+
+**25. 按指定长度分隔数组，并返回嵌套数组**
+
+```typescript
+function splitArrayByLineLen(arr: any[], lineLen:number = 5) {
+	const result = []
+  for (let i = 0; i < arr.length; i += lineLen) {
+    result.push(arr.slice(i, i + lineLen))
+  }
+  return result
+}
+```
+
+
+
+**26. 类的多继承**
+
+```typescript
+function mix<T extends object>(...mixins: (new (...args: any[]) => object)[]): new (...args: any[]) => T {
+  class Mix {
+    constructor() {
+      for (const mixin of mixins) {
+        copyProperties(this, new mixin())
+      }
+    }
+  }
+
+  for (const mixin of mixins) {
+    copyProperties(Mix, mixin)
+    copyProperties(Mix.prototype, mixin.prototype)
+  }
+
+  return Mix as new (...args: any[]) => T
+}
+
+function copyProperties(target: {}, source: {}) {
+  const ignoreKeys: (string|symbol)[] = ['constructor', 'prototype', 'name']
+  for (const key of Reflect.ownKeys(source)) {
+    if (!ignoreKeys.includes(key)) {
+      Object.defineProperty(
+        target,
+        key,
+        Object.getOwnPropertyDescriptor(source, key)
+      )
+    }
+  }
+}
+
+// Example
+class A {
+  static staticMethod() {
+    return 'static A'
+  }
+  instanceMethodA() {
+    return 'instance A'
+  }
+}
+
+class B {
+  static staticMethod() {
+    return 'static B'
+  }
+  instanceMethodB() {
+    return 'instance B'
+  }
+}
+
+const Mixed = mix<A & B>(A, B)
+
+const mixedInstance = new Mixed()
+Mixed.staticMethod() // 'static B'
+mixedInstance.instanceMethodA() // 'instance A'
+mixedInstance.instanceMethodB() // 'instance B'
+```
+
+
+
 
 
 ## JavaScript 数据处理

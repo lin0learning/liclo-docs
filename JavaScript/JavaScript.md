@@ -1607,6 +1607,66 @@ function meGraphList() {
 
 
 
+## 40. 点击图片放大预览
+
+使用原生js事件对特定类名的img监听点击事件：
+
+```js
+const images = document.querySelectorAll('.travel-img')
+images.forEach(img => {
+  img.addEventListener('click', function() {
+    // 创建蒙版
+    const overlay = document.createElement('div')
+    overlay.style.position = 'fixed'
+    overlay.style.top = '0'
+    overlay.style.left = '0'
+    overlay.style.width = '100%'
+    overlay.style.height = '100%'
+    overlay.style.backgroundColor = 'rgba(0,0,0,0.9)'
+    overlay.style.display = 'flex'
+    overlay.style.justifyContent = 'center'
+    overlay.style.alignItems = 'center'
+    overlay.style.zIndex = '1000' // 确保蒙版在最上层
+    
+    // 创建放大图片
+    const fullSizeImg = document.createElement('img')
+    fullSizeImg.src = this.src
+    fullSizeImg.style.maxWidth = '90%'
+    fullSizeImg.style.maxHeight = '90%'
+    fullSizeImg.style.zIndex = '1001'  // 确保图片在蒙版上层
+    
+    // 创建关闭按钮
+    const closeButton = document.createElement('button')
+    closeButton.innerText = '×';
+    closeButton.style.position = 'absolute';
+    closeButton.style.top = '20px';
+    closeButton.style.right = '20px';
+    closeButton.style.backgroundColor = 'transparent';
+    closeButton.style.border = 'none';
+    closeButton.style.color = 'white';
+    closeButton.style.fontSize = '30px';
+    closeButton.style.cursor = 'pointer';
+    closeButton.style.zIndex = '1002'; // 确保关闭按钮在最上层
+    
+    // 将图片和关闭按钮添加到蒙版中
+    overlay.appendChild(fullSizeImg)
+    overlay.appendChild(closeButton)
+    
+    // 将蒙版添加到body中
+    document.body.appendChild(overlay)
+    
+    // 点击蒙版或关闭按钮时移除蒙版
+    overlay.addEventListener('click', function(event) {
+      if (event.target === overlay || event.target === closeButton) {
+        document.body.removeChild(overlay)
+      }
+    })
+  })
+})
+```
+
+
+
 ## 链接
 
 [![NPM Version][npm-image]][npm-url] 

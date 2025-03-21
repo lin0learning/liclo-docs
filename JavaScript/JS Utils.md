@@ -44,6 +44,7 @@ export function createTag(tagName, attrs) {
 ```
 
 **2. 防抖函数**
+
 ```js
 /**
  * 防抖
@@ -434,10 +435,6 @@ function ArrayToMap(arr: Item[]) {
 
 
 
-
-
-
-
 **19. 对象数组按照指定键名进行去重**
 
 ```ts
@@ -677,6 +674,70 @@ Mixed.staticMethod() // 'static B'
 mixedInstance.instanceMethodA() // 'instance A'
 mixedInstance.instanceMethodB() // 'instance B'
 ```
+
+
+
+**27. 分页器Pagination封装**
+
+```js
+import {reactive} from "vue"
+export function getPagination(total = 0, current = 1, pageSize = 10, pageSizeOptions = ["12", "22", "44", "88"]) {
+  return function(callback) {
+    const pagination = reactive({
+      total,
+      current,
+      pageSize,
+      pageSizeOptions,
+      showTotal: () => `总共${pagination.total}条`,
+      showSizeChanger: true, // 是否显示pagesize选择
+      showQuickJumper: false, // 是否显示跳转窗
+      onChange(page, pageSize) {
+        pagination.current = page;
+        pagination.pageSize = pageSize;
+        typeof callback === "function" && callback()
+      },
+      onShowSizeChange(current, pageSize) {
+        pagination.current = current;
+        pagination.pageSize = pageSize;
+        typeof callback === "function" && callback()
+      }
+    });
+    return pagination;
+  }
+}
+```
+
+
+
+**28. 取消回调任务**
+
+```typescript
+export function createCancelTask(asyncTask: (...args: any[]) => Promise<any>) {
+  const NOOP = () => {}
+  let cancel = NOOP  //  闭包
+
+  return (...args: any[]) => {
+    return new Promise((resolve, reject) => {
+      cancel()  // 首次执行为空函数
+
+      cancel = () => {
+        resolve = reject = NOOP  // 第二次将前一次的resolve和reject置为空函数，相当于取消第一次Promiose的回调
+      }
+      asyncTask(...args).then(resolve).catch(reject)
+    })
+  }
+}
+
+// example
+const loadSomething = createCancelTask(async () => {
+  await new Promise((resolve) => {
+    setTimeout(resolve, 1000)
+  })
+  return 123
+})
+```
+
+
 
 
 

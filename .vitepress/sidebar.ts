@@ -64,7 +64,8 @@ const sidebar: DefaultTheme.Sidebar | undefined = {
         { text: 'Promise', link: '/JavaScript/Promise' },
         { text: 'JS工具函数', link: '/JavaScript/JS Utils' },
         { text: 'ECMAScript', link: '/JavaScript/EcmaScript.md' },
-        { text: 'Web Worker', link: '/JavaScript/WebWorker.md' }
+        { text: 'Web Worker', link: '/JavaScript/WebWorker.md' },
+        { text: 'Speech API', link: '/JavaScript/SpeechAPI.md' }
       ]
     },
   ],

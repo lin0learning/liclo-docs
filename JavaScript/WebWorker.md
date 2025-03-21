@@ -347,6 +347,32 @@ const worker3 = new Worker('calc.js')   // 通过构造器导入
 
 
 
+### 三、字符串构造
+
+```js
+const workerScript = `
+  function waitSync(milliseconds) {
+    const start = Date.now()
+    while (Date.now() - start < milliseconds) {}
+  }
+  self.onmessage = function(e) {
+    waitSync(50)
+    self.postMessage('Process complete')
+  }
+`
+
+const blob = new Blob([workerScript], {type: "text/javascript"})
+const worker = new Worker(window.URL.createObjectURL(blob))
+
+worker.postMessage(/**/)
+
+worker.onmessage = function(e) {
+  // ...
+}
+```
+
+
+
 
 
 

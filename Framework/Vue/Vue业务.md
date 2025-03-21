@@ -1137,7 +1137,7 @@ export default Popup;
 ```
 :::
 
-### 方法1：使用 CSS Modules
+### 1. CSS Modules
 CSS Modules 可以为 CSS 类生成唯一的标识符，避免样式冲突。确保构建工具配置支持 CSS Modules，以 Vue CLI(webpack) 为例，可以在 `vue.config.js` 中配置：
 ```js [vue.config.js]
 module.exports = {
@@ -1183,7 +1183,7 @@ export default defineComponent({
 })
 ```
 
-### 方法2：使用 BEM 命名规范
+### 2. 使用 BEM 命名规范
 
 如果不想配置CSS Modules，可以通过 BEM 命名规范来减少样式冲突。BEM 使用一组命名约定来确保样式的唯一性。
 ```less Popup.less
@@ -1199,7 +1199,9 @@ export default defineComponent({
 
 
 
-## 20. 拖拽元素-自定义指令
+## 20. 自定义指令
+
+### 1. vDrag 元素拖拽
 
 `vDrag`：指令作用元素或其父元素的 `position` CSS 属性值为 `absolute`时，元素可拖拽。
 
@@ -1316,9 +1318,41 @@ app.directive('drag', vDrag)
 app.mount("#app")
 ```
 
+
+
+### 2. vFocus 光标聚焦
+
+::: code-group
+
+```ts [vFocus.ts]
+const vFocus = {
+  mounted: (el: HTMLInputElement) => el.focus()
+}
+
+export default vFocus
+```
+
+```ts [main.ts]
+import vFocus from './directives/vFocus'
+
+// ...
+app.directive('focus', vFocus)
+```
+
+```html
+<input vFocus />
+```
+
+
+
+:::
+
+
+
 **补充：Array.prototype.some()**
 `some()` 方法测试数组中是否至少有一个元素通过了由提供的函数实现的测试。如果在数组中找到一个元素使得提供的函数返回 true，则返回 true；否则返回 false。它不会修改数组。
 举例一：判断数组 `numList: number[]` 所有元素是否都大于0
+
 ```js
 const array1 = [1,2,3,4,5]
 const array2 = [0,1,2,3,4]

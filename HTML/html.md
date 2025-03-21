@@ -452,6 +452,8 @@ const getLocalStream = async () => {
 
 :::
 
+方式一：`document.createElementNS()`
+
 使用`document.createElement()`方法创建 `<svg>` 元素时，会出现在页面中不显示的情况，这是由于 `<svg>` 不属于 HTML5 元素，而属于 XML 标准。创建 svg 元素需要使用`document.createElementNS()`,并在第一个参数中传入指定的命名空间 URI：`http://www.w3.org/2000/svg`。svg 元素一般通过 `setAttribute` 方法来设置属性值。
 
 动态创建 svg 及其子元素时，如果 svg 子元素的命名空间与 svg 容器的<font color="red">命名标签不一致</font>时，子元素会<font color="red">无法显示</font>，但在浏览器F12-Elements中能看到 DOM 结构。
@@ -530,6 +532,47 @@ let lineLeft = createTag('line', {
 ```
 
 实践：![image-20240529113428900](https://pic-liclo.oss-cn-chengdu.aliyuncs.com/img2/202405291135780.png)
+
+
+
+方式二：`v-html`
+
+> `v-html`directive can lead to XSS attack
+
+```vue
+<template>
+  <div class="svg-container">
+    <div
+      ref="svgContainer"
+      class="svg-item"
+      v-html="svgString"
+    ></div>
+  </div>
+</template>
+<script>
+export default {
+  data() {
+    return {
+      svgString: ""
+    }
+  },
+  methods() {
+    loadSVG(stationId) {
+      let url = `conf_AP/${stationId}.svg`
+      if (stationId < 1000) {
+        url = "conf_AP/mainTrack.svg"
+      }
+      return this.$axios.get(url).then(res => {
+        this.svgString = res.data
+      }).catch(e => {
+        this.svgString = ""
+        throw e
+      })
+    }
+  }
+}
+</script>
+```
 
 
 

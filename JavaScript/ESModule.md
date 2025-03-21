@@ -151,3 +151,49 @@ import('/modules/my-module.js').then((module) => {
 
 
 
+## 五、模块重导(Re-export)
+
+> 在优化文件`import`语句以防止占用较多代码行（满屏）方面，模块重导不失为一种较好方式。
+
+以组件库为例，通过重导在`components/index.tsx`文件中，使用一个`import`可同时导入多个组件。
+
+```ts
+// 不使用重导
+import Modal from '@arco-design/web-react/es/Modal'
+import Checkbox from '@arco-design/web-react/es/Checkbox'
+import Message from '@arco-design/web-react/es/Message'
+
+// 使用模块重导
+import { Modal, Checkbox, Message} from '@arco-design/web-react'
+```
+
+Re-export的几种形式
+
+1. 直接重导出
+   ```ts
+   export {foo, bar} from './moduleA'
+   ```
+
+2. 重命名并重导出（含默认导出）
+   ```ts
+   // 通过export导出
+   export { foo as newFoo, bar as newBar } from './moduleA'
+   // 通过export default导出的
+   export { default as ModuleDDefault } from './moduleD'
+   ```
+
+3. 重导出整个模块（不含默认导出）
+   ```ts
+   export * from './moduleA'
+   ```
+
+4. 收拢、结合导入与重导
+   ```ts
+   import { foo, bar } from './moduleA'
+   export { foo, bar }
+   ```
+
+   
+
+
+

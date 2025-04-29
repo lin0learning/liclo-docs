@@ -380,3 +380,35 @@ function loadSvg(stationId) {
 
 - 单个数据处理更新会使浏览器重绘，应该统一收集数据更新，再一次性更新，浏览器只重绘一次；
 - 将新数据与原数据做比较，如果没有变化，则不更新视图，只更新数据。
+
+
+
+SVG animate效果：
+
+```html
+<svg viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg">
+  <text x="0" y="2" style="font-size:2px;fill:black;">
+    <animate
+      attributeName="opacity"
+      values="1;0.2;1"
+      dur="2s"
+      repeatCount="indefinite" 
+    />
+    Hello
+  </text>
+</svg>
+```
+
+
+
+<svg viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg">
+  <text x="0" y="2" style="font-size:2px;fill:black;">
+    <animate
+      attributeName="opacity"
+      values="1;0.2;1"
+      dur="2s"
+      repeatCount="indefinite" 
+    />
+    Hello
+  </text>
+</svg>

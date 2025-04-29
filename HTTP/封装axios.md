@@ -43,6 +43,14 @@ class Http {
     this.instance.interceptors.request.use(
       (config) => {
         // 可根据特定 Content-Type 或属性对请求参数作查询字符串序列化(FormData)  qs.stringify(data)
+        const {headers} = config
+        const contentType = headers['Content-Type']
+        if (config.method === 'post') {
+          if (contentType === "application/x-www-form-urlencoded")
+            config.data = qs.stringify(config.data)
+          if (contentType === 'application/json')
+            config.data = JSON.stringify(config.data)
+        }
         return config
       },
       (error) => {
@@ -52,7 +60,7 @@ class Http {
     // 响应拦截
     this.instance.interceptors.response.use(
       (response) => {
-        if (response.config.responseType === 'blob') return response
+        if (['blob', 'arraybuffer'].includes(response.config.responseType)) return response
         return response.data
       },
       (error) => {
@@ -73,7 +81,7 @@ class Http {
     return this.request<T>({ ...config, method: 'post' })
   }
 
-  // ... other method of request
+  // ... other method of request(put, patch, delete)
 }
 
 const http = new Http(BASE_URL, TIME_OUT)

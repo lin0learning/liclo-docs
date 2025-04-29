@@ -739,6 +739,33 @@ const loadSomething = createCancelTask(async () => {
 
 
 
+**29. hexStringToByteArray**
+
+```js
+function hexStringToByteArray(hexString) {
+  // 去掉可能存在的空格和换行符
+  hexString = hexString.replace(/\s+/g, '').toLowerCase();
+
+  // 检查字符串长度是否为偶数
+  if (hexString.length % 2 !== 0) {
+    throw new Error("Invalid hex string length. Length must be even.");
+  }
+
+  // 创建字节数组
+  const byteArray = new Uint8Array(hexString.length / 2);
+
+  // 遍历字符串，每两个字符转换为一个字节
+  for (let i = 0; i < byteArray.length; i++) {
+    const byteValue = parseInt(hexString.substr(i * 2, 2), 16);
+    byteArray[i] = byteValue;
+  }
+
+  return byteArray;
+}
+```
+
+
+
 
 
 

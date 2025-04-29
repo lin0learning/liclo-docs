@@ -21,6 +21,7 @@ Web Worker 能创建一个独立于 Web 应用程序主执行程序的后台线�
 3. 通信联系：Worker线程和主线程不在同一个上下文环境，它们必须通过消息完成
 4. 脚本限制：Worker线程不能执行 `alert()` 和 `confirm()` 方法，但可以使用 XMLHttpRequest
 5. 文件限制：Worker线程无法读取本地文件，即不能打开本机的文件系统（`file://`），它所加载的脚本必须来自网络，且有专门的方法 `importScripts()`
+6. 关闭机制：Worker 不能自动关闭，需要手动关闭；Worker可以在分线程通过`self.close()`进行关闭，也可以在主线程通过`worker.terminate()`进行关闭
 
 
 

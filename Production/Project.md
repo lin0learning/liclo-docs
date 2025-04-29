@@ -397,3 +397,27 @@ export default antfu({
   },
 })
 ```
+
+
+
+## momentjs 转 Dayjs
+
+一、使用`antd-dayjs-webpack-plugin`
+
+可以使用`antd-dayjs-webpack-plugin`插件用 Dayjs 替换 momentjs 来大幅减小打包大小。这需要更新 webpack 配置文件：
+
+```js [webpack-config.js]
+import AntdDayjsWebpackPlugin from 'antd-dayjs-webpack-plugin';
+
+module.exports = {
+  // ...
+  plugins: [new AntdDayjsWebpackPlugin()],
+};
+```
+
+
+
+二、使用 `eslint-plugin-you-dont-need-momentjs`
+
+> peer eslint@"^5.5.0" from eslint-plugin-you-dont-need-momentjs@1.6.0
+

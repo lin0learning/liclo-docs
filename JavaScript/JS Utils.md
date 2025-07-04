@@ -680,30 +680,45 @@ mixedInstance.instanceMethodB() // 'instance B'
 **27. 分页器Pagination封装**
 
 ```js
-import {reactive} from "vue"
-export function getPagination(total = 0, current = 1, pageSize = 10, pageSizeOptions = ["12", "22", "44", "88"]) {
-  return function(callback) {
-    const pagination = reactive({
-      total,
-      current,
-      pageSize,
-      pageSizeOptions,
-      showTotal: () => `总共${pagination.total}条`,
-      showSizeChanger: true, // 是否显示pagesize选择
-      showQuickJumper: false, // 是否显示跳转窗
-      onChange(page, pageSize) {
-        pagination.current = page;
-        pagination.pageSize = pageSize;
-        typeof callback === "function" && callback()
-      },
-      onShowSizeChange(current, pageSize) {
-        pagination.current = current;
-        pagination.pageSize = pageSize;
-        typeof callback === "function" && callback()
-      }
-    });
-    return pagination;
-  }
+import type { PaginationProps } from "ant-design-vue"
+import { reactive } from "vue"
+
+export interface PaginationOption extends PaginationProps {
+  current?: number
+  pageSize?: number
+  pageSizeOptions?: (string | number)[]
+  total?: number
+  callback?: Function
+}
+
+export default ({
+  current = 1,
+  pageSize = 10,
+  pageSizeOptions = ['10', '20', '40', '80'],
+  total = 0,
+  showSizeChanger = false,
+  callback
+}: PaginationOption) => {
+  const pagition = reactive<PaginationOption>({
+    total,
+    current,
+    pageSize,
+    pageSizeOptions,
+    showSizeChanger,
+    showTotal: () => `共${pagition.total}条`,
+    onChange(page, pageSize) {
+      pagition.current = page
+      pagition.pageSize = pageSize
+      callback && callback()
+    },
+    onShowSizeChange(current, pageSize) {
+      pagition.current = current
+      pagition.pageSize = pageSize
+      callback && callback()
+    }
+  })
+
+  return pagition
 }
 ```
 
@@ -764,11 +779,161 @@ function hexStringToByteArray(hexString) {
 }
 ```
 
+**30. 防抖函数**
+
+```typescript
+/**
+ * 防抖函数
+ * @example
+ * const inputDebounce = debounce(input, 300);
+ */
+export function debounce<T, A extends any[]>(
+  fn: (this: T, ...args: A) => void,
+  delay = 300
+) {
+  let timeout: null | ReturnType<typeof setTimeout> = null;
+  return function (this: T, ...args: A) {
+    if (timeout) {
+      clearTimeout(timeout);
+      timeout = null;
+    } else {
+      // 对第一次输入立即执行
+      fn.apply(this, args);
+    }
+    timeout = setTimeout(() => {
+      fn.apply(this, args);
+    }, delay);
+  };
+}
+```
+
+**31. SVG缩放自定义指令(Vue)**
+
+::: code-group
+
+```typescript [vDrag.ts]
+import type { DirectiveBinding } from 'vue'
+
+
+interface Position {
+  x: number
+  y: number
+}
+
+interface DragOptions {
+  min?: number
+  max?: number
+}
+
+// 默认配置
+const DEFAULT_OPTIONS: Required<DragOptions> = {
+  min: 0.5,
+  max: 3,
+}
+
+export const vDrag = {
+  mounted(el: HTMLElement, binding: DirectiveBinding<DragOptions | undefined>) {
+    let isDragging = false
+    let lastPosition: Position = { x: 0, y: 0 }
+    let translate: Position = { x: 0, y: 0 }
+    let scale = 1
+
+    const container = el.parentElement
+    if (!container) return
+
+    // 合并配置
+    const options: Required<DragOptions> = {
+      min: binding.value?.min ?? DEFAULT_OPTIONS.min,
+      max: binding.value?.max ?? DEFAULT_OPTIONS.max,
+    }
+
+    el.style.cursor = 'grab'
+    el.style.userSelect = 'none'
+
+    const applyTransform = () => {
+      el.style.transform = `translate(${translate.x}px, ${translate.y}px) scale(${scale})`
+    }
+
+    const onMouseDown = (e: MouseEvent) => {
+      isDragging = true
+      lastPosition = { x: e.clientX, y: e.clientY }
+      el.style.cursor = 'grabbing'
+    }
+
+    const onMouseMove = (e: MouseEvent) => {
+      if (!isDragging) return
+
+      const dx = e.clientX - lastPosition.x
+      const dy = e.clientY - lastPosition.y
+      lastPosition = { x: e.clientX, y: e.clientY }
+
+      translate.x += dx
+      translate.y += dy
+
+      applyTransform()
+    }
+
+    const onMouseUp = () => {
+      isDragging = false
+      el.style.cursor = 'grab'
+    }
+
+    const onWheel = (e: WheelEvent) => {
+      e.preventDefault()
+
+      const containerRect = container.getBoundingClientRect()
+      const mouseX = e.clientX - containerRect.left
+      const mouseY = e.clientY - containerRect.top
+
+      const prevScale = scale
+      const deltaScale = e.deltaY > 0 ? -0.1 : 0.1
+      scale = Math.min(options.max, Math.max(options.min, scale + deltaScale))
+
+      const scaleRatio = scale / prevScale
+
+      translate.x = (translate.x - mouseX) * scaleRatio + mouseX
+      translate.y = (translate.y - mouseY) * scaleRatio + mouseY
+
+      applyTransform()
+    }
+
+    // 绑定事件
+    el.addEventListener('mousedown', onMouseDown)
+    window.addEventListener('mousemove', onMouseMove)
+    window.addEventListener('mouseup', onMouseUp)
+    el.addEventListener('wheel', onWheel, { passive: false })
+
+    // 清理
+    el.__dragCleanup__ = () => {
+      el.removeEventListener('mousedown', onMouseDown)
+      window.removeEventListener('mousemove', onMouseMove)
+      window.removeEventListener('mouseup', onMouseUp)
+      el.removeEventListener('wheel', onWheel)
+    }
+  },
+
+  unmounted(el: HTMLElement) {
+    el.__dragCleanup__ && el.__dragCleanup__()
+  },
+}
+```
 
 
 
+```typescript [dom.d.ts]
+// 补充HTMLElement的类型
+declare global {
+  interface HTMLElement {
+    __dragCleanup__?: () => void
+  }
+}
+
+export {}
+```
 
 
+
+:::
 
 ## JavaScript 数据处理
 
@@ -896,3 +1061,52 @@ export default {
 
 
 :::
+
+**4. 解析16进制报文**
+
+```javascript
+function hexStringToByteArray(hexString) {
+  // 去掉可能存在的空格和换行符
+  hexString = hexString.replace(/\s+/g, "").toLowerCase()
+  
+  // 检查字符串长度是否为偶数
+  if (hexString.length % 2 !== 0) {
+    throw new Error("Invalid hex string length. Length must be even.");
+  }
+  
+  // 创建字节数组
+  const byteArray = new Uint8Array(hexString.length / 2)
+  
+  // 遍历字符串，每两个字符转换为一个字节
+  for (let i = 0; i < byteArray.length; i++) {
+    const byteValue = parseInt(hexString.subStr(i * 2, 2), 16)
+    byteArray[i] = byteValue
+  }
+  return byteArray
+}
+
+// ------------- example -----------
+import protoRoot from "@/proto/proto"
+const hexStr = "080210850418002002280130a08d0638364000480050c1d2941058a0b70960c1d2941068cde4017081d6941078e8fb03800100880106900101980100a00100a80100b00100b80100c00100c80104d001ff01d801ff01e001ff01e801ff01";
+
+const buffer = hexStringToByteArray(hexStr)
+
+const responseProto = protoRoot.lookupType("MSS.CC2MMI.TrainInfo")
+
+const obj = responseProto.decode(buffer)
+
+console.log("obj", obj)
+```
+
+```js [proto.js]
+"use strict";
+
+var $protobuf = require("protobufjs/light")
+
+var $root = ($protobuf.roots["default"] || ($protobuf.roots["default"] = new $protobuf.Root())).addJSON({
+  // ... your proto rules
+})
+
+module.exports = $root
+```
+

@@ -16,6 +16,12 @@
 - Easy LESS
 - Markdown All in One
 - json2ts
+- Sass
+- SCSS Formatter
+- SCSS IntelliSense
+- vscode-proto3
+- XML
+- i18n Ally
 
 **2. 工程化相关**
 - Remote - SSH

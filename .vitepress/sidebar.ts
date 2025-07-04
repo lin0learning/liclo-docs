@@ -87,6 +87,7 @@ const sidebar: DefaultTheme.Sidebar | undefined = {
         { text: 'Vue Memo', link: '/Framework/Vue/Vue' },
         { text: 'Vue 业务', link: '/Framework/Vue/Vue业务' },
         { text: 'Vue Interview', link: '/Framework/Vue/vue1' },
+        { text: 'Vue 组件', link: '/Framework/Vue/VueComponent.md' }
       ]
     },
     {

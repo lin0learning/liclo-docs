@@ -32,6 +32,8 @@ import type { AxiosInstance, AxiosRequestConfig } from 'axios'
 import axios from 'axios'
 import { BASE_URL, TIME_OUT } from './config'
 
+type UnPack = Omit<AxiosRequestConfig, 'method'>
+
 class Http {
   public instance: AxiosInstance
   constructor(baseURL: string, timeout: number) {
@@ -73,15 +75,33 @@ class Http {
     return this.instance.request(config)
   }
 
-  public get<T>(config: Omit<AxiosRequestConfig, 'method'>) {
-    return this.request<T>({ ...config, method: 'get' })
+  public get<T>(url:string,params?:AxiosRequestConfig['params'], config: UnPack) {
+    return this.request<T>({ ...config, method: 'get', url, params })
   }
 
-  public post<T>(config: Omit<AxiosRequestConfig, 'method'>) {
-    return this.request<T>({ ...config, method: 'post' })
+  public post<T>(url:string, data?: AxiosRequestConfig['data'], config: UnPack) {
+    return this.request<T>({ ...config, method: 'post', url, data })
   }
 
-  // ... other method of request(put, patch, delete)
+  public put<T>(config: Unpack) {
+    return this.request<T>({ ...config, method: 'put' })
+  }
+  
+  public patch<T>(config: Unpack) {
+    return this.request<T>({ ...config, method: 'patch' })
+  }
+  
+  public delete<T>(config: Unpack) {
+    return this.delete<T>({
+      ...config,
+      method: 'delete',
+      headers: {
+        ...config.headers,
+        'X-Requested-Width': 'XMLHttpRequest',
+        'Content-Type': 'application/json;charset=UTF-8',
+      }
+    })
+  }
 }
 
 const http = new Http(BASE_URL, TIME_OUT)
@@ -282,6 +302,34 @@ watchEffect((onCleanup) => {
   })
 })
 ```
+
+## 取消在pending状态的接口回调
+
+```typescript
+/** 取消上次未及时响应接口的回调任务 */
+export function createCancelTask<T, R>(asyncTask: AsyncTask<T, R>) {
+  const NOOP = () => {};
+  let cancel = NOOP;
+  return (args: T) => {
+    return new Promise<R>((resolve, reject) => {
+      cancel()  // 首次为空函数，第二次执行时将resolve与reject置空，取消上一次的回调
+  
+      cancel = () => {
+        resolve = reject = NOOP // 第二次将前一次的resolve和reject置为空函数，相当于取消第一次Promiose的回调（第二次回调触发时间早于第一次回调触发的情况）
+      }
+      asyncTask(args).then(
+        res => resolve(res),
+        err => reject(err)
+      )
+    })
+  }
+}
+```
+
+
+
+
+
 
 
 ##  Axios 拦截器实现原理

@@ -603,3 +603,32 @@ git submodule add http://192.168.15.0:9090/config/config.git config
 ```
 
 最后，提交添加子模块的变更。
+
+获取 submodule
+
+上述步骤在创建子模块的过程中，会自动将相关代码克隆到对应路径，但对于后续使用者而言，对于主项目使用普通的`clone`操作并不会拉取到子模块中的实际代码。
+
+如果希望子模块代码也获取到，一种方式是在克隆主项目的时候带上参数 `--recurse-submodules`，这样git会递归地拉去所有子模块中的代码。
+
+```bash
+cd /path/to/dir
+git clone <your-project-registry> --recurse-submodules
+```
+
+此时，`/your-project/project-sub-1`文件夹是有内容的，并且固定在某个Git提交的版本上。
+
+另一种方式是，在当前主项目中执行：
+
+```bash
+git submodule init
+git submodule update
+```
+
+则会根据主项目的配置信息（`.gitmodules`文件），拉去更新子模块中的代码。配置信息示例如下：
+
+```[.gitmodules]
+[submodule "project-sub-1"]
+  path = protofiles
+  url = http://xxx/project-sub-1.git
+```
+

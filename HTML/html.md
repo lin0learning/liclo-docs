@@ -646,3 +646,61 @@ unhandleRejection => Promise
 
 
 
+## 21. LLMs.txt
+
+`LLMs.txt`是放置在网站根目录下的一个文件，它的核心目标是向 LLMs 提供结构化的、机器可读的信息，从而帮助它们在推理阶段更有效地利用网站内容。与面向搜索引擎的 `robots.txt` 和 `sitemap.xml` 不同， `LLMs.txt` 专为推理引擎优化，它的目标是通过以 AI 能够高效处理的格式提供内容结构，解决了 AI 相关的挑战。
+
+以ApiFox项目中的LLMs.txt文件信息举例：
+
+```
+# 个人项目
+
+## API Docs
+- xx项目 [等级分布](https://apifox.com/xx.md)
+```
+
+````markdown
+# 等级分布
+
+## OpenAPI Specification
+
+```yaml
+openapi: 3.0.1
+info:
+  title: ''
+  description: ''
+  version: 1.0.0
+paths:
+  /iom/psd/getPsdDeviceHealthList:
+    post:
+      summary: 等级分布
+      deprecated: false
+      description: ''
+      tags:
+        - xx项目
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+          headers: {}
+          x-apifox-name: 成功
+      security: []
+      x-apifox-folder: xx项目
+      x-apifox-status: developing
+      x-run-in-apifox: https://app.apifox.com/xxx
+components:
+  schemas: {}
+  securitySchemes: {}
+servers: []
+security: []
+
+```
+````
+
+
+

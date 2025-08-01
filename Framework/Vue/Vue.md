@@ -1603,3 +1603,66 @@ export default {
 }
 ```
 
+
+
+## 异步组件
+
+根据项目需要，拆分应用为更小的块，仅在需要时从服务器等加载组件，Vue提供 `defineAsyncComponent`来实现：
+
+```js
+import {defineAsyncComponent} from 'vue'
+
+const AsyncComp = defineAsyncComponent(() => {
+  return new Promise((resolve, reject) => {
+    resolve(/**/)
+  })
+})
+```
+
+**ES模块动态导入** 也会返回一个 Promise，多数情况下相结合：
+
+```js
+import {defineAsyncComponent} from 'vue'
+
+const AsyncComp = defineAsyncComponent(() => {
+  import('./components/MyComponent.vue')
+})
+
+// 使用 `app.component` 全局注册
+app.component('MyComponent', defineAsyncComponent(() => {
+  return import('./components/MyComponent.vue')
+}))
+```
+
+**简易实现**
+
+```js
+import {h, shallowRef} from "vue";
+
+export function defineAsyncComponent(options) {
+  if (typeof options === "function") {
+    options = {
+      loader: options,
+    };
+  }
+  const {
+    loader,
+    loadingComponent = () => h("div", "Loading..."),
+    errorComponent = () => h("div", "Error"),
+    delay = 200, timeout = 3000
+  } = options;
+
+  return {
+    setup() {
+      const component = shallowRef(loadingComponent);
+      loader().then((com) => {
+        component.value = com;
+      }).catch(err => {
+        component.value = errorComponent;
+      });
+      return () => h(component.value);
+    },
+  };
+}
+```
+

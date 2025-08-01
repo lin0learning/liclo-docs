@@ -935,6 +935,48 @@ export {}
 
 :::
 
+
+**32. svg转图片类型下载**
+
+```js
+export function convertSVG2Image(node, width = 600, height = 500, type = 'png') {
+  return new Promise((resolve, reject) => {
+    const seriallizer = new XMLSerializer()
+
+    const source = `<?xml version="1.0" standalone="no"?>\r\n` + seriallizer.serializeToString(node)
+
+    const image = new Image()
+    image.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(source)
+
+    const canvasEl = document.createElement('canvas')
+    canvasEl.width = width
+    canvasEl.height = height
+
+    const context = canvasEl.getContext('2d')
+
+    context.fillStyle = 'transparent'
+    context.fillRect(0, 0, width, height)
+    image.onload = function () {
+      context.drawImage(image, 0, 0, width, height)
+      // 将canvas 转为 blob
+      canvasEl.toBlob((blob) => {
+        if (!blob) {
+          reject(new Error('SVG 转图片失败'))
+          return
+        }
+        // 创建 File 对象
+        const file = new File([blob], `image.${type}`, {type: `image/${type}`})
+        resolve(file)
+      }, `image/${type}`)
+    }
+
+    image.onerror = function (err) {
+      reject(new Error('图片加载失败: ' + err.message || err))
+    }
+  })
+}
+```
+
 ## JavaScript 数据处理
 
 **1. 对象数组按照指定键名进行去重**

@@ -632,3 +632,64 @@ git submodule update
   url = http://xxx/project-sub-1.git
 ```
 
+
+
+## Git仓库迁移同步方法
+
+1. 克隆旧仓库的最新代码（或已有一份旧仓库的副本）：
+   ```bash
+   git clone http://old-server.com/your-project.git old-project
+   cd old-project
+   ```
+
+   
+
+2. 添加新仓库作为远程源：
+   ```bash
+   git remote add new-origin http://new-server.com/your-project.git
+   ```
+
+   
+
+3. 拉去旧服务器上所有提交（包括新提交）：
+   ```bash
+   git fetch origin
+   ```
+
+   
+
+4. 推送所有分支和Tag到新仓库：
+   ```bash
+   git push new-origin --all
+   git push new-origin --tags
+   ```
+
+5. 更新Origin（可选）
+
+   1. 查看当前的 Origin 地址
+      ```bash
+      git remote -v
+      ```
+
+   2. 修改 Origin 地址（分为直接修改、删除后重新添加、手动修改配置文件）
+
+      ```bash
+      git remote set-url origin 新的URL地址
+      
+      git remote remove origin
+      git remote add origin 新的URL地址
+      ```
+
+      打开`.git/config`文件
+
+      ```bash
+      nano .git/config
+      ```
+
+   3. 验证修改是否成功
+      ```bash
+      git remote -v
+      ```
+
+      
+

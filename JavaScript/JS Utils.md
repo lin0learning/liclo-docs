@@ -977,6 +977,109 @@ export function convertSVG2Image(node, width = 600, height = 500, type = 'png') 
 }
 ```
 
+**33. Echarts 折线图超出上下限部分高亮（使用visualMap）**
+
+> <img src="https://pic-liclo.oss-cn-chengdu.aliyuncs.com/img2/202508141400940.png" alt="line-simple (1)" style="zoom:50%;" />
+
+```js
+const upLimit = 100;
+const lowLimit = 50;
+
+const lineColor = ['#52c41a', '#13c2c2', '#1677ff', '#faad14', '#a0d911'];
+
+const visualMap = lineColor.map((item, index) => ({
+  type: 'piecewise',
+  show: false,
+  dimension: 1,
+  seriesIndex: index,
+  pieces: [
+    { gt: upLimit, color: 'red' },
+    { lt: lowLimit, color: 'gray' }
+  ],
+  outOfRange: { color: lineColor[index] }
+}));
+
+option = {
+  tooltip: {
+    trigger: 'axis'
+  },
+  xAxis: {
+    type: 'category',
+    boundaryGap: false
+  },
+  yAxis: {
+    type: 'value'
+  },
+  visualMap,
+  color: lineColor,
+  series: [
+    {
+      name: 'Email',
+      type: 'line',
+      data: [34, 92, 15, 128, 77, 0, 156]
+    },
+    {
+      name: 'Union Ads',
+      type: 'line',
+      data: [48, 143, 6, 89, 120, 42, 159]
+    },
+    {
+      name: 'Video Ads',
+      type: 'line',
+      data: [21, 110, 75, 37, 148, 63, 99]
+    },
+    {
+      name: 'Direct',
+      type: 'line',
+      data: [155, 13, 67, 104, 29, 131, 51]
+    },
+    {
+      name: 'Search Engine',
+      type: 'line',
+      data: [8, 137, 44, 116, 93, 27, 160]
+    },
+    {
+      name: '上限值',
+      type: 'line',
+      smooth: false,
+      symbol: 'none',
+      lineStyle: {
+        width: 2 // 此处不能设置lineColor
+      },
+      markLine: {
+        symbol: 'none',
+        label: {
+          show: false
+        },
+        lineStyle: { color: 'red' },
+        data: [{ yAxis: upLimit }]
+      }
+    },
+    {
+      name: '下限值',
+      type: 'line',
+      smooth: false,
+      symbol: 'none',
+      lineStyle: {
+        width: 2  // 此处不能设置lineColor
+      },
+      markLine: {
+        symbol: 'none',
+        label: {
+          show: false
+        },
+        lineStyle: { color: 'gray' },
+        data: [{ yAxis: lowLimit }]
+      }
+    }
+  ]
+};
+```
+
+
+
+
+
 ## JavaScript 数据处理
 
 **1. 对象数组按照指定键名进行去重**

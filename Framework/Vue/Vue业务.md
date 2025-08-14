@@ -1212,15 +1212,13 @@ export default defineComponent({
 4. 当父元素存在类名 'u-popup__content-wrapper-mini' 和 'u-popup__content-wrapper-fullscreen' 其中的一个时，无法拽拖
 
 ```js [drag.js]
-import {onUnmounted} from 'vue';
-
 const vDrag = {
   /**
    * @param {Element} el
    */
   mounted(el) {
     let oDiv = el;
-    let minTop = oDiv.getAttribute('drag-min-top');
+    let minTop = +oDiv.getAttribute('drag-min-top');
     const ifMoveSizeArea  = 20;
 
     while (window.getComputedStyle(oDiv).position !== 'absolute' && oDiv !== document.body) {
@@ -1228,57 +1226,56 @@ const vDrag = {
     }
     minTop = Number(minTop) + Number(oDiv.clientHeight / 2); // 应对绝对定位时的transform: translateY(-50%);
 
-    function handleReturn(target) {
-      let classArray = Array.from(target.classList);
-      let targetClasses = ['u-popup__content-wrapper-mini', 'u-popup__content-wrapper-fullscreen'];
-      if (classArray.some(className => targetClasses.includes(className))) return true;
-    }
-
     const onMouseDown = (e) => {
-      if (handleReturn(oDiv)) return;
+      let target = oDiv
 
-      let target = oDiv;
-      document.onselectstart = () => false;
-
-      if (!target.getAttribute('init_x')) {
-        target.setAttribute('init_x', target.offsetLeft);
-        target.setAttribute('init_y', target.offsetTop);
+      if (!['absolute', 'fixed'].includes(window.getComputedStyle(target).position)) {
+        target = target.parentElement
+      }
+      if (!['absolute', 'fixed'].includes(window.getComputedStyle(target).position)) {
+        target = target.parentElement
       }
 
-      const initX = parseInt(target.getAttribute('init_x'));
-      const initY = parseInt(target.getAttribute('init_y'));
+      document.onselectstart = () => false
 
-      const disX = e.clientX - target.offsetLeft;
-      const disY = e.clientY - target.offsetTop;
+      if (!target.getAttribute('init_x')) {
+        target.setAttribute('init_x', target.offsetLeft)
+        target.setAttribute('init_y', target.offsetTop)
+      }
+      const offsetTop = target.clientHeight / 2
+
+      const initX = parseInt(target.getAttribute('init_x'))
+      const initY = parseInt(target.getAttribute('init_y'))
+
+      const disX = e.clientX - target.offsetLeft
+      const disY = e.clientY - target.offsetTop
 
       const onMouseMove = (e) => {
-        if (handleReturn(oDiv)) return;
-
         // 计算移动的距离
-        const l = e.clientX - disX;
-        const t = e.clientY - disY;
+        const l = e.clientX - disX
+        const t = e.clientY - disY
         // 计算移动当前元素的位置，并且给该元素样式中的left和top值赋值
-        target.style.left = `${l}px`;
-        target.style.top = `${t < minTop ? minTop : t}px`;
+        target.style.left = `${l}px`
+        target.style.top = `${t < minTop + offsetTop ? minTop + offsetTop : t}px`
 
         if (Math.abs(l - initX) > ifMoveSizeArea || Math.abs(t - initY) > ifMoveSizeArea) {
-          target.setAttribute('dragged', '');
+          target.setAttribute('dragged', '')
         } else {
-          target.removeAttribute('dragged');
+          target.removeAttribute('dragged')
         }
-      };
+      }
 
       const onMouseUp = () => {
-        document.removeEventListener('mousemove', onMouseMove);
-        document.removeEventListener('mouseup', onMouseUp);
-        document.onselectstart = null;
-      };
+        document.removeEventListener('mousemove', onMouseMove)
+        document.removeEventListener('mouseup', onMouseUp)
+        document.onselectstart = null
+      }
 
-      document.addEventListener('mousemove', onMouseMove);
-      document.addEventListener('mouseup', onMouseUp);
+      document.addEventListener('mousemove', onMouseMove)
+      document.addEventListener('mouseup', onMouseUp)
 
-      return false;
-    };
+      return false
+    }
 
     oDiv.addEventListener('mousedown', onMouseDown);
   },
@@ -1316,6 +1313,14 @@ const app = createApp(App)
 app.directive('drag', vDrag)
 
 app.mount("#app")
+```
+
+
+
+**使用方式三：withDirectives**
+
+```js
+withDirectives(VNOde, [drag])
 ```
 
 
@@ -1362,6 +1367,97 @@ const aboveZero = num => num > 0
 array1.some(aboveZero)  // true
 array2.some(aboveZero)  // false
 ```
+
+
+
+**3. SvgPanZoom**
+
+```js
+/** 
+  * @example
+  * // 1. 通过v-bind绑定配置
+  * <div style="absolute">
+  *   <svg v-svg-pan-zoom="{minScale: 0.5, maxScale: 5, scaleStep: 0.1, originScale: 1, originX: 0, originY: 0}"></svg>
+  * </div>
+  * // 2. withDirectives绑定
+  * withDirectives(svg, [svgPanZoom, {minScale: 0.5, maxScale: 5, scaleStep: 0.1, originScale: 1, originX: 0, originY: 0}])
+  * // 3. 全局注册
+  * app.directive("svg-pan-zoom", svgPanZoom);
+ */  
+export default {
+  mounted(el, binding) {
+    const {minScale = 0.5, maxScale = 5, scaleStep = 0.1, originScale = 1, originX: initX = 0, originY: initY = 0} = binding.value || {};
+
+    let scale = originScale;
+    let originX = initX;
+    let originY = initY;
+    let startX = 0;
+    let startY = 0;
+    let isDragging = false;
+
+    const applyTransform = () => {
+      el.style.transform = `translate(${originX}px, ${originY}px) scale(${scale})`;
+      el.style.transformOrigin = "0 0";
+    };
+
+    applyTransform(); // 初始应用
+
+    const onMouseDown = (e) => {
+      if (e.button !== 0) return; // only left-click
+      isDragging = true;
+      startX = e.clientX - originX;
+      startY = e.clientY - originY;
+      document.addEventListener("mousemove", onMouseMove);
+      document.addEventListener("mouseup", onMouseUp);
+    };
+
+    const onMouseMove = (e) => {
+      if (!isDragging) return;
+      originX = e.clientX - startX;
+      originY = e.clientY - startY;
+      applyTransform();
+    };
+
+    const onMouseUp = () => {
+      isDragging = false;
+      document.removeEventListener("mousemove", onMouseMove);
+      document.removeEventListener("mouseup", onMouseUp);
+    };
+
+    const onWheel = (e) => {
+      e.preventDefault();
+      const {offsetX, offsetY} = e;
+      const oldScale = scale;
+      const delta = e.deltaY > 0 ? -scaleStep : scaleStep;
+      scale = Math.min(maxScale, Math.max(minScale, scale + delta));
+
+      // 缩放时，保持鼠标位置为基准
+      originX = (originX - offsetX) * (scale / oldScale) + offsetX;
+      originY = (originY - offsetY) * (scale / oldScale) + offsetY;
+
+      applyTransform();
+    };
+
+    el.style.cursor = "grab";
+    el.addEventListener("mousedown", onMouseDown);
+    el.addEventListener("wheel", onWheel, {passive: false});
+
+    el.__svgPanZoomCleanup__ = () => {
+      el.removeEventListener("mousedown", onMouseDown);
+      el.removeEventListener("wheel", onWheel);
+      document.removeEventListener("mousemove", onMouseMove);
+      document.removeEventListener("mouseup", onMouseUp);
+    };
+  },
+
+  unmounted(el) {
+    el.__svgPanZoomCleanup__?.();
+  },
+};
+```
+
+
+
 
 
 ## 21. `<a-table>` 可编辑行

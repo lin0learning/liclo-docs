@@ -720,3 +720,121 @@ window.addEventListener('beforeunload', function() {
 })
 ```
 
+
+
+## 23. 解决表格高度不能适应flex，高度不断增加
+
+`<a-table>`与`<el-table>`组件，当其父元素是设置了`flex: 1`时，表格的高度会不断增长。解决办法：在表格组件外加一层元素，此元素为绝对定位，其父元素设置相对定位。
+
+```html
+<div class="table-wrap">
+  <div class="table-content">
+    <el-table></el-table>
+    <!-- 或者 a-table -->
+  </div>
+</div>
+<style>
+  .table-wrap {
+    flex: 1;
+    position: relative;
+  }
+  .table-content {
+    position: absolute;
+    width: 100%;
+    height: 100%
+  }
+</style>
+```
+
+
+
+## 24.定义元素的宽高比
+
+一、现代浏览器写法
+
+`aspect-ratio` 是一个相对较新的 CSS 属性，用来定义元素的宽高比。它在 **现代浏览器（Chrome 88+、Firefox 89+、Safari 15+、Edge 88+）** 都已支持。
+
+```css
+.box {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #ccc;
+}
+```
+
+二、兼容性方案`padding-top`
+
+利用 **padding 百分比是相对父元素宽度计算的** 特性，达到固定宽高比的效果。
+
+```html
+<div class="ratio-box">
+  <div class="content">
+    固定宽高比内容
+  </div>
+</div>
+```
+
+```css
+.ratio-box {
+  position: relative;
+  width: 100%;
+  /* 高度 = 宽度 * 9 / 16 */
+  padding-top: calc(100% * 9 / 16);
+  background: #eee;
+}
+
+.ratio-box .content {
+  position: absolute;
+  inset: 0; /* 等价于 top:0; right:0; bottom:0; left:0 */
+}
+```
+
+
+
+实际工程写法
+
+```css
+.box {
+  width: 100%;
+  background: #ddd;
+
+  /* 现代浏览器 */
+  aspect-ratio: 16 / 9;
+
+  /* 旧浏览器 fallback */
+  position: relative;
+}
+.box::before {
+  content: "";
+  display: block;
+  padding-top: calc(100% * 9 / 16); /* fallback */
+}
+```
+
+
+
+## 25. video标签
+
+> 与`<audio>`类似，`<video>`元素用于在文档中嵌入媒体播放器
+
+```html
+<video autoplay="" muted="" loop="" playsinline="" id="myVideo" poster="http://xxx/xx.png">
+  <source
+    data-src="http://default.mp4"
+    type="video/mp4"
+    src="https://default.mp4">
+</video>
+```
+
+- autoplay，布尔属性，声明该属性后，视频会尽快自动开始播放，不会停下来等待数据全部加载完成
+- poster，海报帧图片URL，用于在视频处于下载中的状态时显示。如果未指定，则在视频第一帧可用之前不显示任何内容，然后用视频的第一帧作为海报帧来显示
+
+`<source>`，媒体或图像资源元素，为`<picture>`、`<audio>`和`<video>`元素指定一个或多个媒体资源，为空元素，没有内容，也不需要关闭标签，通常用于以多种文件格式提供相同的媒体内容，以便与多种浏览器兼容。
+
+## 26. 在HTML中引入Svg
+
+```html
+<object data="../switchMap.svg" type="image/svg+xml"></object>
+<img src="../switchMap.svg">
+```
+

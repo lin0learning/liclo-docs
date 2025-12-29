@@ -1667,6 +1667,67 @@ images.forEach(img => {
 
 
 
+## 41. JavaScript标准内置对象
+
+构造函数
+
+- Symbol()
+
+静态方法：
+
+- Symbol.for()
+- Symbol.keyFor()
+
+静态属性：
+
+- Symbol.iterator
+
+- Symbol.match
+
+- Symbol.replace
+
+- Symbol.search
+
+- Symbol.split
+
+- Symbol.toPrimitive
+  `Symbol.toPrimitive`，指定了一种接受首选类型并返回对象原始值的表示方法。它被所有的强类型转换制算法优先调用。
+
+  ```js
+  const obj = {
+    [Symbol.toPrimitive](hint) {
+      if (hint === 'number') return 42
+      return null
+    }
+  }
+  +obj // 42
+  ```
+
+实现一个`sum()`函数
+
+```js
+function sum(...initial) {
+  let total = args.reduce((a,b) => a + b, 0)
+  
+  const adder = (...args) => {
+    if (args.length === 0) return total
+    total += args.reduce((a,b) => a +b, 0)
+    return adder
+  }
+  
+  // 内置属性返回total
+  adder[Symbol.toPrimitive] = () => total
+  adder.valueOf = () => total
+  adder.toString = () => String(total)
+  
+  return adder
+}
+```
+
+
+
+
+
 ## 链接
 
 [![NPM Version][npm-image]][npm-url] 

@@ -359,21 +359,23 @@ Access-Control-Request-Headers: X-PRODUCT
    3. 接收数据 (HTTP 长轮询)
    4. 升级 (WebSocket)
    5. 接收数据 (HTTP 长轮询, WebSocket连接建立成功后关闭)
-2. **206**: `Partial Content`
-2. **302**：`Found`。请求的目标资源临时移动到了另一个 URI 上，服务器会在响应头的 Location 字段放上这个不同的 URI，浏览器可以使用 Location 中的 URI 进行自动重定向
-3. **304**：`Not Modified`。如果客户端发送了一个带条件的GET 请求且该请求已被允许，而文档的内容（自上次访问以来或者根据请求的条件）并没有改变，则服务器应当返回这个304状态码。简单表述：服务端执行了 `GET` 请求，但文件未变化。首次请求服务端返回`ETab`，在第二次请求后请求头携带这个`Etag`，会跟第二次的`Etag`对比。
-4. **307**：`Internal Redirect`。307 的定义实际上和  302 是一致的，唯一的区别在于：307 状态码不允许浏览器将原本为 POST 的请求重定向到 GET 请求上。
-5. **400**：连接`mysql`失败，数据源驱动不存在
-6. **401**：在使用POST请求进行登录时，未成功登录并返回401，代表客户端错误，指的是由于缺乏目标资源要求的身份验证凭证，发送的请求未得到满足
-7. **403**：`forbidden`。无权限访问此站，如在请求时出现了跨域(CORS)，那么预检请求`Preflight`会报错403状态码。
-8. **405**： `Not Allowed` (nginx)请求的静态文件采用的是post方法，nginx是不允许post访问静态资源
-9. **415**: `Unsupported Media Type`
-10. **429**：太多请求，get方法。detail为`Too many requests in 1 hour. Try again later. You have being rate limited`.
-11. **426**: `Upgrade Required`。一种错误状态码，表示服务器拒绝处理客户端使用当前协议发送的请求，但是可以接受其使用升级后的协议发送的请求。
-12. **415**: `Unsupported Media Type` 
-13. **500**：`Internal Server Error`
-14. **503**：服务不可访问，比如上传图片链接，采用POST请求等出现跨域
-15. **504**：`Gateway Timeout`，
+2. **206**: `Partial Content` 请求一个Type为media的资源（如mp3格式）时返回
+3. **301**：`Moved Permanently` 永久重定向
+4. **302**：`Found`。请求的目标资源临时移动到了另一个 URI 上，服务器会在响应头的 Location 字段放上这个不同的 URI，浏览器可以使用 Location 中的 URI 进行自动重定向
+5. **304**：`Not Modified`。如果客户端发送了一个带条件的GET 请求且该请求已被允许，而文档的内容（自上次访问以来或者根据请求的条件）并没有改变，则服务器应当返回这个304状态码。简单表述：服务端执行了 `GET` 请求，但文件未变化。首次请求服务端返回`ETab`，在第二次请求后请求头携带这个`Etag`，会跟第二次的`Etag`对比。
+6. **307**：`Internal Redirect`。307 的定义实际上和  302 是一致的，唯一的区别在于：307 状态码不允许浏览器将原本为 POST 的请求重定向到 GET 请求上。
+7. **400**：连接`mysql`失败，数据源驱动不存在
+8. **401**：在使用POST请求进行登录时，未成功登录并返回401，代表客户端错误，指的是由于缺乏目标资源要求的身份验证凭证，发送的请求未得到满足
+9. **403**：`forbidden`。无权限访问此站，如在请求时出现了跨域(CORS)，那么预检请求`Preflight`会报错403状态码。
+10. **405**： `Not Allowed` (nginx)请求的静态文件采用的是post方法，nginx是不允许post访问静态资源
+11. **415**: `Unsupported Media Type` example:`Content type 'application/x-www-form-urlencoded;charset=UTF-8' not supported`
+12. **429**：太多请求，get方法。detail为`Too many requests in 1 hour. Try again later. You have being rate limited`.
+13. **426**: `Upgrade Required`。一种错误状态码，表示服务器拒绝处理客户端使用当前协议发送的请求，但是可以接受其使用升级后的协议发送的请求。
+14. **415**: `Unsupported Media Type` 
+15. **500**：`Internal Server Error`
+16. **502**：`Bad Gateway` 
+17. **503**：服务不可访问，比如上传图片链接，采用POST请求等出现跨域
+18. **504**：`Gateway Timeout`，
 
 
 
@@ -412,3 +414,41 @@ Access-Control-Request-Headers: X-PRODUCT
 ## 10. new::ERR_CRET_COMMON_NAME_INVALID
 
 在调用 `https` 请求时，使用IP + 端口而非域名时会请求失败，并报以上错误。
+
+
+
+## 11. 使用protobufer加解密请求/响应
+
+所需工具：
+
+- pbjs
+- proto协议
+
+首先使用pbjs将指定的proto协议文件转换为commonjs或esmodule文件。
+
+```js
+let requestProto = protoRoot.lookupType("HistoryEventRequest")
+let responseProto = protoRoot.lookupType("EventRecords")
+
+let params = {
+  startTime: 1755683725,
+  endTime: 1756202145
+}
+
+params = new Blob([requestProto.encode(requestProto.create(params)).finish()], {type: "buffer"})
+
+axios.post("/xxx", params, {
+  headers: {
+    "Content-Type": "application/octet-stream"
+  },
+  responseType: "blob"
+}).then(res => {
+  let reader = new FileReader()
+  reader.readAsArrayBuffer(res.data)
+  reader.onload = function(e) {
+    const buf = new Unit8Array(reader.result)
+    const responseData = responseProto.decode(buf)
+  }
+})
+```
+

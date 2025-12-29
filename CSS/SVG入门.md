@@ -294,7 +294,21 @@ SVG中的 `<foreignObject>`元素允许包含来自不同的 XML 命名空间的
 </svg>
 ```
 
+`<foreignObject>`高度自适应：
 
+> foreignObject 的 width 和 height 属性是必须的，并且其值必须大于0，否则该元素将不会被呈现。由于放大和缩小`foreignObject`本身并无实际用途，因此可以将foreignObject `height`和`width`都设置为`1`，并通过 CSS set`foreignObject {overflow:visible}`使其内容可见，并根据需要对其执行任何操作。
+
+```html
+<foreignObject width="1" height="1"></foreignObject>
+<style>
+  foreignObject {
+    overflow: visible
+  }
+  foreignObject > body {
+    height: fit-content;
+  }
+</style>
+```
 
 
 

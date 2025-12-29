@@ -773,6 +773,32 @@ type Case1 = Example<1 | '3' | {} | []> // boolean | '3' | boolean | boolean => 
 
 
 
+## TypeScript 自定义工具
+
+**GetReadOnlyKeys**
+
+```typescript
+type GetReadOnlyKeys<T> = {
+  [K in keyof T]: T[K] extends ReadOnly<T[K]> ? K : never
+}[keyof T]
+```
+
+**GetWritableKeys**
+
+```typescript
+type GetWritableKeys<T> = {
+  [K in keyof T]: T[K] extends ReadOnly<T[K]> ? never : K
+}[keyof T]
+```
+
+**GetOptionalKeys**
+
+```typescript
+type GetOptionalKeys<T> = {
+  [K in keyof T]: T[K] extends undefined ? K : never
+}[keyof T]
+```
+
 
 
 

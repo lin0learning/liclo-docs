@@ -1317,3 +1317,77 @@ footer {
 
 
 
+### 六、flex两端对齐、最后一行左对齐
+
+:::code-group
+
+```html
+<div class="container">
+  <div class="list"></div>
+  <div class="list"></div>
+  <div class="list"></div>
+  <div class="list"></div>
+  <div class="list"></div>
+  <div class="list"></div>
+  <div class="list"></div>
+  <div class="list"></div>
+  <div class="list"></div>
+  <div class="list"></div>
+  <div class="list"></div>
+</div>
+<div>
+  切换子项目数量
+  <select id="select">
+    <option value="9">9</option>
+    <option value="10">10</option>
+    <option value="11">11</option>
+    <option value="12">12</option>
+    <option value="13">13</option>
+  </selction>
+</div>
+```
+
+```css
+body {
+  height: 1000px;
+}
+.container {
+  float: left;
+  border: 1px solid #000;
+  display: flex;
+  width: 290px;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  resize: both;
+}
+.list {
+  width: 65px;
+  height: 65px;
+  margin-bottom: 10px;
+  background-color: rgb(148, 148, 131);
+  margin-right: 10px;
+}
+.list:nth-child(4n) {
+  margin-right: 0px;
+}
+.container::after {
+  content: '';
+  display: block;
+  flex: 1 1 auto;
+}
+```
+
+```js
+let container = document.querySelector('.container');
+let box = document.querySelector('#select')
+
+box.onchange = (e) => {
+  let len = e.target.value;
+  let html = Array.from({length: len}, () => `<div class="list"></div>`).reduce((pre, item) => {
+    return pre += item;
+  }, '');
+  container.innerHTML = html;
+}
+```
+
+:::

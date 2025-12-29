@@ -1076,7 +1076,126 @@ option = {
 };
 ```
 
+**34. loadScript**
 
+```js
+function loadScript(relativePath) {
+  return new Promise((resolve, reject) => {
+    const script = document.createElement("script")
+    script.src = `${relativePath}`
+    script.async = true
+    script.onload = () => resolve()
+    script.onerror = (e) => reject(e)
+    document.head.appendChild(script)
+  })
+}
+```
+
+
+
+**35. 创建定时任务类**
+
+```js
+/**
+ * 定时任务类
+ * 用于创建和管理单个定时任务，支持启动、停止和状态查询
+ */
+class TimerTask {
+  /**
+   * 创建定时任务实例
+   * 
+   * @param {string} name - 任务名称，用于标识和日志输出
+   * @param {Function} fn - 要执行的函数，每次定时触发时调用
+   * @param {number} interval - 执行间隔时间（毫秒），必须大于0
+   * @throws {Error} 当 interval 小于等于0时抛出错误
+   */
+  constructor(name, fn, interval) {
+    this.name = name;
+    this.fn = fn;
+    this.interval = interval;
+    this.id = null;
+  }
+
+  start() {
+    if (this.id) return;
+    this.id = setInterval(this.fn, this.interval);
+    // console.log(`TimerTask ${this.name} started`);
+  }
+
+  stop() {
+    if (!this.id) return;
+    clearInterval(this.id);
+    this.id = null;
+    // console.log(`TimerTask ${this.name} stopped`);
+  }
+
+  isRunning() {
+    return this.id !== null;
+  }
+}
+
+/**
+ * 任务调度器类
+ * 采用统一调度器 + 状态机式任务管理
+ * 确保同一时间只有一个任务在运行，启动新任务时会自动停止当前任务
+ */
+class Scheduler {
+  constructor() {
+    /** @type {Map<string, TimerTask>} 已注册的任务映射表，key为任务名称 */
+    this.tasks = new Map();
+    this.currentTask = null;
+  }
+
+  registerTask(task) {
+    this.tasks.set(task.name, task);
+  }
+
+  startTask(taskName) {
+    // 任务不存在
+    const task = this.tasks.get(taskName);
+    if (!task) return console.warn(`Task ${taskName} not found`);
+
+    // 如果已经是当前任务则无需处理
+    if (this.currentTask === task) return;
+
+    // 停止所有任务
+    this.stopAll();
+
+    // 启动新任务
+    task.start();
+    this.currentTask = task;
+  }
+
+  stopAll() {
+    this.tasks.forEach((task) => task.stop());
+    this.currentTask = null;
+  }
+}
+
+export {TimerTask, Scheduler};
+
+
+// example
+import {TimerTask, Scheduler()} from '@/utils/timerTask.js' 
+const scheduler = new Scheduler()
+scheduler.registerTask(new TimerTask("task1", parseTaskOne, 2000))
+scheduler.registerTask(new TimerTask("task2", parseTaskTwo, 2000))
+
+scheduler.startTask("task1")
+scheduler.stopAll()
+```
+
+**36. 自定义格式化小数点**
+
+```js
+function formatFixedNumber(num, fixed = 2) {
+  const numberNum = Number(num);
+  if (isNaN(numberNum)) return "--";
+
+  const formattedNum = numberNum.toFixed(fixed).replace(/\.?0+$/, "");
+  return formattedNum;
+}
+```
 
 
 

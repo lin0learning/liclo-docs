@@ -1212,74 +1212,75 @@ export default defineComponent({
 4. 当父元素存在类名 'u-popup__content-wrapper-mini' 和 'u-popup__content-wrapper-fullscreen' 其中的一个时，无法拽拖
 
 ```js [drag.js]
+/** 
+  * @example
+  * <div style="absolute">
+  *   <section v-drag></section>
+  * </div>
+ */  
 const vDrag = {
   /**
    * @param {Element} el
    */
-  mounted(el) {
-    let oDiv = el;
-    let minTop = +oDiv.getAttribute('drag-min-top');
-    const ifMoveSizeArea  = 20;
-
-    while (window.getComputedStyle(oDiv).position !== 'absolute' && oDiv !== document.body) {
-      oDiv = oDiv.parentElement;
-    }
-    minTop = Number(minTop) + Number(oDiv.clientHeight / 2); // 应对绝对定位时的transform: translateY(-50%);
+  mounted(el, binding) {
+    const oDiv = el;
+    const {minTop} = binding.value;
+    const ifMoveSizeArea = 20;
 
     const onMouseDown = (e) => {
-      let target = oDiv
+      let target = oDiv;
 
-      if (!['absolute', 'fixed'].includes(window.getComputedStyle(target).position)) {
-        target = target.parentElement
+      if (!["absolute", "fixed"].includes(window.getComputedStyle(target).position)) {
+        target = target.parentElement;
       }
-      if (!['absolute', 'fixed'].includes(window.getComputedStyle(target).position)) {
-        target = target.parentElement
+      if (!["absolute", "fixed"].includes(window.getComputedStyle(target).position)) {
+        target = target.parentElement;
       }
 
-      document.onselectstart = () => false
+      document.onselectstart = () => false;
 
-      if (!target.getAttribute('init_x')) {
-        target.setAttribute('init_x', target.offsetLeft)
-        target.setAttribute('init_y', target.offsetTop)
+      if (!target.getAttribute("init_x")) {
+        target.setAttribute("init_x", target.offsetLeft);
+        target.setAttribute("init_y", target.offsetTop);
       }
-      const offsetTop = target.clientHeight / 2
+      const offsetTop = target.clientHeight / 2;
 
-      const initX = parseInt(target.getAttribute('init_x'))
-      const initY = parseInt(target.getAttribute('init_y'))
+      const initX = parseInt(target.getAttribute("init_x"));
+      const initY = parseInt(target.getAttribute("init_y"));
 
-      const disX = e.clientX - target.offsetLeft
-      const disY = e.clientY - target.offsetTop
+      const disX = e.clientX - target.offsetLeft;
+      const disY = e.clientY - target.offsetTop;
 
       const onMouseMove = (e) => {
         // 计算移动的距离
-        const l = e.clientX - disX
-        const t = e.clientY - disY
+        const l = e.clientX - disX;
+        const t = e.clientY - disY;
         // 计算移动当前元素的位置，并且给该元素样式中的left和top值赋值
-        target.style.left = `${l}px`
-        target.style.top = `${t < minTop + offsetTop ? minTop + offsetTop : t}px`
+        target.style.left = `${l}px`;
+        target.style.top = `${t < minTop + offsetTop ? minTop + offsetTop : t}px`;
 
         if (Math.abs(l - initX) > ifMoveSizeArea || Math.abs(t - initY) > ifMoveSizeArea) {
-          target.setAttribute('dragged', '')
+          target.setAttribute("dragged", "");
         } else {
-          target.removeAttribute('dragged')
+          target.removeAttribute("dragged");
         }
-      }
+      };
 
       const onMouseUp = () => {
-        document.removeEventListener('mousemove', onMouseMove)
-        document.removeEventListener('mouseup', onMouseUp)
-        document.onselectstart = null
-      }
+        document.removeEventListener("mousemove", onMouseMove);
+        document.removeEventListener("mouseup", onMouseUp);
+        document.onselectstart = null;
+      };
 
-      document.addEventListener('mousemove', onMouseMove)
-      document.addEventListener('mouseup', onMouseUp)
+      document.addEventListener("mousemove", onMouseMove);
+      document.addEventListener("mouseup", onMouseUp);
 
-      return false
-    }
+      return false;
+    };
 
-    oDiv.addEventListener('mousedown', onMouseDown);
+    oDiv.addEventListener("mousedown", onMouseDown);
   },
-  unmounted(el) {}
+  unmounted(el) {},
 };
 
 export default vDrag;
@@ -1325,55 +1326,10 @@ withDirectives(VNOde, [drag])
 
 
 
-### 2. vFocus 光标聚焦
+### 2. vPanZoom SVG拖拽/放大缩小
 
-::: code-group
-
-```ts [vFocus.ts]
-const vFocus = {
-  mounted: (el: HTMLInputElement) => el.focus()
-}
-
-export default vFocus
-```
-
-```ts [main.ts]
-import vFocus from './directives/vFocus'
-
-// ...
-app.directive('focus', vFocus)
-```
-
-```html
-<input vFocus />
-```
-
-
-
-:::
-
-
-
-**补充：Array.prototype.some()**
-`some()` 方法测试数组中是否至少有一个元素通过了由提供的函数实现的测试。如果在数组中找到一个元素使得提供的函数返回 true，则返回 true；否则返回 false。它不会修改数组。
-举例一：判断数组 `numList: number[]` 所有元素是否都大于0
-
-```js
-const array1 = [1,2,3,4,5]
-const array2 = [0,1,2,3,4]
-
-const aboveZero = num => num > 0
-
-array1.some(aboveZero)  // true
-array2.some(aboveZero)  // false
-```
-
-
-
-**3. SvgPanZoom**
-
-```js
-/** 
+```ts [panZoom.ts]
+/**
   * @example
   * // 1. 通过v-bind绑定配置
   * <div style="absolute">
@@ -1383,7 +1339,7 @@ array2.some(aboveZero)  // false
   * withDirectives(svg, [svgPanZoom, {minScale: 0.5, maxScale: 5, scaleStep: 0.1, originScale: 1, originX: 0, originY: 0}])
   * // 3. 全局注册
   * app.directive("svg-pan-zoom", svgPanZoom);
- */  
+ */
 export default {
   mounted(el, binding) {
     const {minScale = 0.5, maxScale = 5, scaleStep = 0.1, originScale = 1, originX: initX = 0, originY: initY = 0} = binding.value || {};
@@ -1394,16 +1350,51 @@ export default {
     let startX = 0;
     let startY = 0;
     let isDragging = false;
+    const isSvg = el.tagName && el.tagName.toLowerCase() === "svg";
+    const SVG_NS = "http://www.w3.org/2000/svg";
+
+    // <g>元素优先级高于<svg>元素，作用于<svg>的transform 会使<g>元素内容被裁切
+    let targetEl = el;
+    if (isSvg) {
+      // 确保内容不被根svg视口裁切
+      el.setAttribute("overflow", "visible");
+      el.style.overflow = "visible";
+
+      // 优先使用第一个顶级<g>作为transform目标；否则将子元素包装在<g>中
+      const firstGroup = el.querySelector(":scope > g");
+      if (firstGroup) {
+        targetEl = firstGroup;
+      } else {
+        const wrapper = document.createElementNS(SVG_NS, "g");
+        wrapper.setAttribute("data-pan-zoom-wrapper", "true");
+        while (el.firstChild) wrapper.appendChild(el.firstChild);
+        el.appendChild(wrapper);
+        targetEl = wrapper;
+      }
+
+      // 如果viewBox不存在，则初始化为内容边界，防止初始裁切
+      try {
+        if (!el.hasAttribute("viewBox")) {
+          const bbox = targetEl.getBBox();
+          if (bbox && isFinite(bbox.width) && isFinite(bbox.height) && bbox.width > 0 && bbox.height > 0) {
+            el.setAttribute("viewBox", `${bbox.x} ${bbox.y} ${bbox.width} ${bbox.height}`);
+          }
+        }
+      } catch (_) {
+        // 忽略getBBox错误（例如，尚未渲染内容）
+      }
+    }
 
     const applyTransform = () => {
-      el.style.transform = `translate(${originX}px, ${originY}px) scale(${scale})`;
-      el.style.transformOrigin = "0 0";
+      // 使用CSS transforms在内部<g>（或元素本身）上保持指针运算在CSS像素中
+      targetEl.style.transform = `translate(${originX}px, ${originY}px) scale(${scale})`;
+      targetEl.style.transformOrigin = "0 0";
     };
 
     applyTransform(); // 初始应用
 
     const onMouseDown = (e) => {
-      if (e.button !== 0) return; // only left-click
+      if (e.button !== 0) return; // 只左键
       isDragging = true;
       startX = e.clientX - originX;
       startY = e.clientY - originY;
@@ -1454,9 +1445,8 @@ export default {
     el.__svgPanZoomCleanup__?.();
   },
 };
+
 ```
-
-
 
 
 
@@ -1488,7 +1478,7 @@ export default {
     </template>
   </a-table>
 </template>
-<script>
+<script setup>
 const editableData = reactive({});
 const handleEditTitle = (record) => {
   const {id} = record;
@@ -1959,12 +1949,74 @@ export async function request(url:string, ...params: any[]) {
 
 
 
+## 27. useAsyncComponent异步组件
 
+```typescript
+import { BaseLoading, BaseNoData } from "@/components";
 
+type Options = {
+  loadingComponent?: Component;
+  errorComponent?: Component;
+  timeout?: number;
+  loaderComponent: Component;
+  loader: () => Promise<any>;
+  onSuccess?: (res: any) => void;
+  onError?: (err: any) => void;
+}
 
+export function useAsyncComponent(options: Options) {
+  const { loadingComponent = BaseLoading, errorComponent = BaseNoData, timeout = 3000, loaderComponent, loader, onSuccess, onError } = options;
 
+  const component = shallowRef<any>(loadingComponent);
 
+  /** timeout control */
+  const timeoutFn = new Promise((resolve, reject) => {
+    setTimeout(() => {
+      reject(new Error('timeout'));
+    }, timeout);
+  });
 
+  const raceFn = Promise.race([loader(), timeoutFn]);
+  async function load() {
+    try {
+      const res = await raceFn;
+      component.value = loaderComponent;
+      onSuccess?.(res);
+    } catch (err) {
+      component.value = errorComponent;
+      onError?.(err);
+    }
+  }
+  load();
+
+  return {
+    component
+  }
+}
+```
+**组件应用**
+
+```vue
+<template>
+<component :is="component" :orderDetail="orderDetail"/>
+</template>
+<script setup lang="ts">
+import { useAsyncComponent } from "@/hooks/useAsyncComponent";
+  
+const { component } = useAsyncComponent({
+  loader: getOrderDetailData,
+  loaderComponent: OrderDetailTemplate,
+  onSuccess: (res) => {
+    if (res.code === 1 && res.data) {
+      orderDetail.value = res.data;
+    }
+  },
+  onError: (_err) => {
+    showFailToast("获取工单详情失败");
+  }
+});
+</script>
+```
 
 
 

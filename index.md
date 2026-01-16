@@ -17,7 +17,7 @@ hero:
       link: /guide
     - theme: alt
       text: Github
-      link: https://github.com
+      link: https://github.com/lin0learning/liclo-docs
 
 features:
   - title: Web

@@ -65,7 +65,10 @@ const sidebar: DefaultTheme.Sidebar | undefined = {
         { text: 'JS工具函数', link: '/JavaScript/JS Utils' },
         { text: 'ECMAScript', link: '/JavaScript/EcmaScript.md' },
         { text: 'Web Worker', link: '/JavaScript/WebWorker.md' },
-        { text: 'Speech API', link: '/JavaScript/SpeechAPI.md' }
+        { text: 'IndexedDB', link: '/JavaScript/IndexedDB.md' },
+        { text: 'Speech API', link: '/JavaScript/SpeechAPI.md' },
+        { text: 'MediaRecorder API', link: '/JavaScript/MediaRecorderAPI.md' },
+        { text: 'Break & Return', link: '/JavaScript/Break&Return.md' },
       ]
     },
   ],

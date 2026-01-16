@@ -1197,6 +1197,21 @@ function formatFixedNumber(num, fixed = 2) {
 }
 ```
 
+**37. Promise.prototype.finally兼容实现**
+
+```js
+if (typeof Promise !== 'undefined' && !Promise.prototype.finally) {
+  Promise.prototype.finally = function (onFinally) {
+    const Constructor = this.constructor;
+    const handler = typeof onFinally === 'function' ? onFinally : () => {};
+    return this.then(
+      (value) => Constructor.resolve(onFinally()).then(() => value),
+      (reason) => Constructor.resolve(onFinally()).then(() => { throw reason; })
+    );
+  };
+}
+```
+
 
 
 ## JavaScript 数据处理

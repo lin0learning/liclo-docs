@@ -319,3 +319,71 @@ export default defineConfig({
 
 
 feat：[TypeScript & React](https://www.yuque.com/fechaichai/tsicdr)
+
+
+
+
+
+## React HOC Typescript
+
+在使用 TypeScript 编写 React 高阶组件 (HOC) 或高阶函数时，可以使用 `React.ComponentType` 或 泛型来为高阶组件提供类型。
+
+**高阶组件 (HOC) `React.ComponentType` **
+
+```typescript
+import React, { ComponentType } from 'react';
+
+interface InjectedProps {
+  // 定义高阶组件注入的属性
+  prop1: string;
+  prop2: number;
+}
+
+const withHOC = <P extends InjectedProps>(
+  WrappedComponent: ComponentType<P>
+) => {
+  // 定义高阶组件的状态和其他逻辑
+
+  // 返回一个新的组件
+  const HOC: React.FC<Omit<P, keyof InjectedProps>> = (props) => {
+    // 在这里可以进行一些逻辑，然后将 props 传递给包裹的组件
+    return <WrappedComponent {...props as P} prop1="value1" prop2={42} />;
+  };
+
+  return HOC;
+};
+
+// 使用高阶组件
+const EnhancedComponent = withHOC(YourComponent);
+
+// 在使用组件时， TypeScript 会强制执行注入的属性
+<EnhancedComponent someProp="value" />;
+```
+
+**高阶函数 使用泛型**
+
+```typescript
+interface InjectedProps {
+  prop1: string;
+  prop2: number;
+}
+
+const withHigherOrderFunction = <P extends InjectedProps>(
+  WrappedComponent: React.ComponentType<P>
+) => {
+  // 返回一个新的函数组件
+  const EnhancedComponent: React.FC<Omit<P, keyof InjectedProps>> = (props) => {
+    // 在这里可以进行一些逻辑，然后将 props 传递给包裹的组件
+    return <WrappedComponent {...props as P} prop1="value1" prop2={42} />;
+  };
+
+  return EnhancedComponent;
+};
+
+// 使用高阶函数
+const EnhancedComponent = withHigherOrderFunction(YourComponent);
+
+// 在使用组件时， TypeScript 会强制执行注入的属性
+<EnhancedComponent someProp="value" />;
+```
+

@@ -1703,6 +1703,35 @@ images.forEach(img => {
   +obj // 42
   ```
 
+## 42. 监测 Window 对象新增属性
+
+```js
+// 1. 获取当前所有 key 的函数
+const getWindowKeys = () => Object.keys(window);
+
+// 2. 在脚本运行前记录初始状态
+const initialKeys = new Set(getWindowKeys());
+
+// ... 你的业务逻辑或其他脚本运行 ...
+
+// 3. 运行后检测差异
+const detectChanges = () => {
+  const currentKeys = getWindowKeys();
+  const added = currentKeys.filter(key => !initialKeys.has(key));
+  
+  console.log("新增属性数量:", added.length);
+  console.log("新增属性列表:", added);
+  return added;
+};
+
+// 执行检测
+detectChanges();
+```
+
+
+
+
+
 实现一个`sum()`函数
 
 ```js

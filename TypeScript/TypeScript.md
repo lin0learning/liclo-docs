@@ -1091,6 +1091,18 @@ type Partial<T> = {
 
 
 
+**3. 反转元祖**
+
+```typescript
+type ReverseTuple<T extends any[]> = {
+  [K in keyof T]: T[T['length'] - 1 - K];
+}
+```
+
+
+
+
+
 ## setTimeout() 函数的类型
 
 **使用 ReturnTyp 推断**

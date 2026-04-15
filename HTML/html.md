@@ -838,3 +838,15 @@ window.addEventListener('beforeunload', function() {
 <img src="../switchMap.svg">
 ```
 
+
+
+## 27. 事件叠加
+
+在JavaScript中，使用`addEventListener`方法向元素添加事件监听器时，如果有多个相同的事件名称（比如多次调用`addEventListener("click", function)`)，这些监听器不会互相覆盖，而是会累加。
+这意味着所有为同一事件类型注册的监听器都会按照添加的顺序依次触发，而不是只有最后一个生效。
+
+这是因为`addEventListener`方法设计为允许向一个元素添加多个事件处理程序，而不会替换之前已经存在的处理程序。
+这对于需要对同一个事件执行多个操作或者多个独立逻辑的场景非常有用。如果需要移除特定的监听器，可以使用`removeEventListener`方法，并传入与添加时相同的事件类型和处理函数。
+
+相比之下，老的DOM0级方法（如直接将函数赋值给`element.onclick`）会覆盖之前设置的事件处理函数，因为它们直接改变了元素的属性值。
+这也是为什么在现代Web开发中推荐使用`addEventListener`和`removeEventListener`来管理事件，以获得更好的控制和灵活性。

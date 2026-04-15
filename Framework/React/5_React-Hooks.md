@@ -528,6 +528,69 @@ useLayoutEffect 和 useEffect 非常相似，它们仅有的区别为：
 
 
 
+## 9. useSyncExternalStore
+
+**useSyncExternalStore** 是 React 18 中引入的一个 Hook，用于订阅外部 store 并在 store 发生变化时触发组件更新。这个 Hook 对于集成非 React 状态管理库或浏览器 API 非常有用。
+
+两个必需的参数：*subscribe* 和 *getSnapshot*。*subscribe* 是一个函数，用于订阅 store 并返回一个取消订阅的函数；*getSnapshot* 是一个函数，用于从 store 中获取当前数据的快照。
+
+```typescript
+const snapshot = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot?)
+```
+
+使用
+
+- 订阅外部 store
+- 订阅浏览器 API
+- 添加服务端渲染支持
+- 把逻辑抽取至自定义 Hook
+
+在组件顶层调用 `useSyncExternalStore` 以从外部 store 读取值。
+
+```typescript
+import { useSyncExternalStore } from 'react';
+
+import { todosStore } from './todoStore.js';
+
+
+
+function TodosApp() {
+
+  const todos = useSyncExternalStore(todosStore.subscribe, todosStore.getSnapshot);
+
+  // ...
+
+}
+```
+
+它返回 store 中数据的快照。你需要传两个函数作为参数：
+
+1. `subscribe` 函数应当订阅该 store 并返回一个取消订阅的函数。
+2. `getSnapshot` 函数应当从该 store 读取数据的**快照**，通过`Object.is`对比。
+
+**订阅浏览器 API**
+
+```tsx
+import { useSyncExternalStore } from 'react';
+function getSnapshot() {
+ return navigator.onLine;
+}
+function subscribe(callback) {
+ window.addEventListener('online', callback);
+ window.addEventListener('offline', callback);
+ return () => {
+   window.removeEventListener('online', callback);
+   window.removeEventListener('offline', callback);
+ };
+}
+function ChatIndicator() {
+ const isOnline = useSyncExternalStore(subscribe, getSnapshot);
+ return <div>{isOnline ? '✅ Online' : '❌ Disconnected'}</div>;
+}
+```
+
+
+
 ## 自定义 Hook
 
 ### 1. Context 共享

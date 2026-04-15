@@ -452,3 +452,91 @@ axios.post("/xxx", params, {
 })
 ```
 
+
+
+## 12. Cookie/LocalStorage
+
+> 本质区别
+
+本质区别：cookie会跟随请求，localStorage为本地存储。
+
+> cookie 4kb大小限制
+
+cookie本质不是解决存储问题，而是让HTTP请求有状态，如果太大，会影响网络延时
+
+> HttpOnly SameSite 解决什么
+
+HttpOnly：不能在浏览器中操作cookie，防 XSS
+
+SameSite：只能在同域下访问cookie，防 CSRF
+
+> JWT 放在cookie，而不是localStorage
+
+```javascript
+// 使用 httpOnly Cookie（后端设置 完整配置）
+res.cookie('jwt', token, {
+    httpOnly: true,   // 防止 XSS 读取（禁止JS访问）
+    secure: true,     // 仅 HTTPS 传输（生产环境必须）
+    sameSite: 'strict', // 或 'lax'，防止 CSRF
+    maxAge: 900000,   // 15分钟（毫秒）
+    path: '/',        // 作用路径
+    domain: 'example.com' // 域名（谨慎设置）
+});
+
+// 双重 Cookie 验证
+const csrfToken = getCookie('csrf_token');
+fetch('/api/data', {
+    headers: { 'X-CSRF-Token': csrfToken }
+});
+
+// Cookie 方式自动携带（无需额外代码）
+fetch('/api/user', {credentials: 'include'});
+
+// Cookie 方式（后端清除）
+res.clearCookie('token');
+```
+
+安全建议：
+
+1. **localStorage + JWT**：注意防范 XSS（对用户输入转义、使用 CSP）
+2. **httpOnly Cookie**：使用 CSRF Token 或设置 `sameSite='strict'`
+3. 设置较短的过期时间（如15分钟）+ Refresh Token 机制
+4. 始终使用 HTTPS 传输
+5. sameSite：`strict` 完全禁止跨站携带; `lax`: 允许顶级导航和 GET 请求
+
+刷新机制：
+
+```javascript
+// 方案一：双 Token（推荐）
+// Access Token（15分钟）- 放在 Cookie
+// Refresh Token（7天）- 另一个 Cookie 或数据库
+
+app.post('/refresh', async (req, res) => {
+    const refreshToken = req.cookies.refreshToken;
+    if (!refreshToken) return res.sendStatus(401);
+    
+    try {
+        const user = verifyRefreshToken(refreshToken);
+        const newAccessToken = generateAccessToken(user);
+        
+        res.cookie('jwt', newAccessToken, {
+            httpOnly: true,
+            secure: true,
+            sameSite: 'strict',
+            maxAge: 900000
+        });
+        res.sendStatus(200);
+    } catch {
+        res.sendStatus(403);
+    }
+});
+
+// 前端拦截器自动刷新
+fetch('/api/data').catch(async (err) => {
+    if (err.status === 401) {
+        await fetch('/refresh', { method: 'POST' });
+        return retryRequest();
+    }
+});
+```
+

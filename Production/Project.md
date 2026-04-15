@@ -2,7 +2,7 @@
 
 ## pnpm
 
-### 优点：
+**优点：**
 
 - 采用硬链接和软链接的方式进行依赖包的管理，硬链接共享同一份硬盘地址，软连接相当于快捷方式，其不占用资源；
 - 安装的包在`.pnpn sotre`中，通过软链接到这个仓库，为非扁平化方式。
@@ -13,7 +13,7 @@
 pnpm store path
 ```
 
-### pnpm常用命令：
+**pnpm常用命令：**
 
 ```bash
 pnpm add/install/uninstall/remove xxx
@@ -55,7 +55,66 @@ packages:
 
 
 
+### Catalogs
 
+> [参考文档](https://pnpm.io/zh/catalogs)
+
+"Catalogs"是一个[工作空间功能](https://pnpm.io/zh/workspaces)，可将依赖项版本定义为可复用常量。目录中定义的常量稍后可以在`package.json`文件中引用。
+
+在`pnpm-workspace.yaml`中定义目录，
+
+```yaml [pnpm-workspace.yaml]
+packages:
+  - packages/*
+
+# 定义目录和依赖版本号
+catalog:
+  react: ^18.3.1
+  redux: ^5.0.1
+```
+
+可以使用`catalog:`协议来代替依赖项版本。
+
+```json [packages/example-app/package.json]
+{
+  "name": "@example/app",
+  "dependencies": {
+    "react": "catalog:",
+    "redux": "catalog:"
+  }
+}
+```
+
+这等于直接写入一个版本范围（例如`^18.3.1）。
+
+```json [packages/example-app/package.json]
+{
+  "name": "@example/app",
+  "dependencies": {
+    "react": "^18.3.1",
+    "redux": "^5.0.1"
+  }
+}
+```
+
+可以在以下字段中使用"catalog:"协议：
+
+- `package.json`
+  - `dependencies`
+  - `peerDependencies`
+  - `optionalDependencies`
+- `pnpm-workspace.yaml`
+  - `overrides`
+
+Catalog 协议允许在冒号后使用可选名称 (例如：`catalog:name`) 来指定应使用哪个目录。
+
+**优势**
+
+在工作空间（即 monorepo 或多包 repo）中，许多包使用相同的依赖项是很常见的。 在编写 `package.json` 文件时，目录可以减少重复，并在此过程中提供一些好处：
+
+- **维护唯一版本** - 我们通常希望在工作空间中共同的依赖项版本一致。 Catalog 让工作区内共同依赖项的版本更容易维护。 重复的依赖关系可能会在运行时冲突并导致错误。 当使用打包器时，不同版本的重复依赖项也会增大项目体积。
+- **易于更新** — 升级或者更新依赖项版本时，只需编辑 `pnpm-workspace.yaml` 中的目录，而不需要更改所有用到该依赖项的 `package.json` 文件。 这样可以节省时间 — 只需更改一行，而不是多行。
+- **减少合并冲突** — 由于在升级依赖项时不需要编辑 `package.json`文件，所以这些依赖项版本更新时就不会发生 git 冲突。
 
 ## package 幽灵依赖
 

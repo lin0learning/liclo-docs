@@ -6,6 +6,18 @@
 >
 > 原文章地址：[掘金](https://juejin.cn/post/7325730345840066612)
 
+## 前言
+
+Server-sent Events（SSE）是 HTML5 中的一项重要特性，它允许服务器实时向客户端推送数据，并且在客户端接收到数据时触发事件。相比 WebSocket，SSE 更加轻量级，不需要建立一个全双工的连接，而且可以使用 HTTP/1.1 和 HTTP/2.0 协议。但是，由于 HTTP/1.1 和 HTTP/2.0 的协议特性不同，所以在实现 SSE 的兼容性时需要考虑到这些差异。
+
+- **HTTP/1.1**：
+  - 浏览器对同一域名有连接数限制（通常为6个）；
+  - SSE 使用长轮询（long-polling）的方式实现；
+  - 每个SSE连接会占用一个TCP连接，可能影响其他资源加载。
+- **HTTP/2**：
+  - SSE 使用 Server Push 的方式实现（HTTP2.0新特性）；
+  - 支持**多路复用**，多个SSE流可以通过单一TCP连接并行传输。
+
 ## EventSource实例
 
 `type: eventsource` 。一个 `EventSource` 实例会对 HTTP 服务器开启一个持久化的连接，以`text/event-stream`格式发送事件，此连接会一直保持开启直到通过调用 `EventSource.close()` 关闭。EventStore实质上是一个<font color="red">不断开连接的 HTTP 请求</font>，也会占用一个并发请求连接数。

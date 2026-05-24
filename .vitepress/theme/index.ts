@@ -5,6 +5,7 @@ import DefaultTheme from 'vitepress/theme'
 import { onMounted, watch, nextTick } from 'vue'
 import { useRoute } from 'vitepress'
 import mediumZoom from 'medium-zoom'
+import Skeleton from '../components/Skeleton.vue'
 import './style.css'
 import './global.css'
 
@@ -31,6 +32,6 @@ export default {
     })
   },
   enhanceApp({ app, router, siteData }) {
-    // ...
+    app.component('Skeleton', Skeleton)
   }
 } satisfies Theme

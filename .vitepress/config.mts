@@ -22,40 +22,57 @@ export default defineConfig({
     sidebarMenuLabel: '归档',
     nav: [
       {
-        text: 'Origin',
+        text: '开始',
         items: [
-          { text: 'HTML', link: '/HTML/html' },
-          { text: 'CSS', link: '/CSS/样式&布局' },
-          { text: 'JavaScript', link: '/JavaScript/JavaScript' },
-          { text: 'TypeScript', link: '/TypeScript/TypeScript' }
+          { text: '文档导读', link: '/guide' },
+          { text: '文档重构方案', link: '/文档重构方案' },
         ]
       },
       {
-        text: '框架',
+        text: '基础核心',
         items: [
-          { text: 'Vue', link: '/Framework/Vue/Vue' },
-          { text: 'React', link: '/Framework/React/1_React-Component' },
-          { text: '微信小程序', link: '/Framework/MiniProgram/Weapp' },
+          { text: '总览', link: '/基础核心' },
+          { text: 'HTML', link: '/基础核心/HTML/html' },
+          { text: 'CSS', link: '/基础核心/CSS/样式&布局' },
+          { text: 'JavaScript', link: '/基础核心/JavaScript/JavaScript' },
+          { text: 'TypeScript', link: '/基础核心/TypeScript/TypeScript' }
         ]
       },
       {
-        text: '工程化',
+        text: '浏览器与通信',
         items: [
-          { text: 'Git', link: '/Production/Git' },
-          { text: 'Node', link: '/Production/node' },
-          { text: 'Project', link: '/Production/Project' },
+          { text: '总览', link: '/浏览器与通信' },
+          { text: 'HTTP', link: '/浏览器与通信/HTTP/http' },
+          { text: 'Web Worker', link: '/浏览器与通信/浏览器能力/WebWorker' },
+          { text: 'IndexedDB', link: '/浏览器与通信/浏览器能力/IndexedDB' },
         ]
       },
       {
-        text: 'HTTP',
+        text: '框架与应用',
         items: [
-          { text: 'HTTP', link: '/HTTP/http' },
-          { text: '基本请求方式', link: '/HTTP/基本请求方式' },
-          { text: 'Axios 封装', link: '/HTTP/封装axios' },
-          { text: 'websocket 封装', link: '/HTTP/封装websocket.md' },
-          { text: 'socket.io 封装', link: '/HTTP/封装SocketIO.md' },
-          { text: 'BroadcastChannel 封装', link: '/HTTP/封装BroadcastChannel' },
-          { text: 'EventSource 封装', link: '/HTTP/封装SSE'}
+          { text: '总览', link: '/框架与应用' },
+          { text: 'Vue', link: '/框架与应用/Vue/Vue' },
+          { text: 'React', link: '/框架与应用/React/1_React-Component' },
+          { text: '微信小程序', link: '/框架与应用/微信小程序/Weapp' },
+        ]
+      },
+      {
+        text: '工程化与交付',
+        items: [
+          { text: '总览', link: '/工程化与交付' },
+          { text: 'Git', link: '/工程化与交付/协作与环境/Git' },
+          { text: 'Node', link: '/工程化与交付/协作与环境/node' },
+          { text: 'Project', link: '/工程化与交付/协作与环境/Project' },
+          { text: 'VitePress', link: '/文档站与知识库维护/VitePress' },
+        ]
+      },
+      {
+        text: '实践与维护',
+        items: [
+          { text: '实践案例与封装', link: '/实践案例与封装' },
+          { text: '文档站与知识库维护', link: '/文档站与知识库维护' },
+          { text: 'Axios 封装', link: '/实践案例与封装/请求与通信封装/封装axios' },
+          { text: 'Vue 业务实践', link: '/实践案例与封装/业务方案/Vue业务' },
         ]
       }
     ],

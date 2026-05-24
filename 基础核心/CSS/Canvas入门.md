@@ -180,10 +180,9 @@ ctx.rotate(
 ```
 
 ## 使用 Canvas 实现钟表动画
-<script setup>
-import ClockVue from '../.vitepress/theme/components/Clock.vue'
-</script>
-<ClockVue />
+
+下面保留钟表动画的核心实现代码，方便后续直接移植到独立 demo 中。原来的内嵌组件演示在目录重构后已移除，避免示例依赖站点内部路径。
+
 **HTML 结构如下：**
 ```html [index.html]
 <div class="bg">

@@ -287,3 +287,168 @@ const ModalConfirm = defineComponent({
 export default ModalConfirm;
 ```
 
+## 4. ConnectorLine
+
+## Hook 设计方案：`useDomConnectorLine`
+
+### 职责
+
+在 `containerRef` 的坐标系里画一条 水平线段，连接 `fromRef` 与 `toRef`（默认：`from` 的右边缘 → `to` 的左边缘，竖直位置取二者垂直中心的中点）。
+
+### 文件位置
+
+```
+src/composables/useDomConnectorLine.ts
+```
+
+### 入参
+
+| 参数           | 含义                                                         |
+| :------------- | :----------------------------------------------------------- |
+| `fromRef`      | 起点锚点（如左侧 `.cc-line-left`）                           |
+| `toRef`        | 终点锚点（如右侧 `.cc-line-right`）                          |
+| `containerRef` | `position: relative/absolute` 的祖先，线段 `left/top` 相对该盒模型 |
+| `options`      | 可选：`lineHeight`（默认 2）、`fromRightToLeft`（默认 `true`） |
+
+### 返回值
+
+| 字段            | 用途                                                         |
+| :-------------- | :----------------------------------------------------------- |
+| `ConnectorLine` | 用 `<component :is="ConnectorLine" class="…" />` 挂在 template；根节点为 `div`，合并传入的 `class` / 其它 attrs |
+| `lineMetrics`   | `reactive({ left, top, width })`，便于调试或别处只读使用     |
+| `update()`      | 手动刷新几何（锚点被 `v-if` 换掉、仅子树布局变化而 container 尺寸未变 时可调用） |
+
+### 实现要点（为何这样设计）
+
+1. 几何用 `reactive`：`ResizeObserver` 回调里改字段；返回的内联组件在 `render` 里读 `lineMetrics`，自动建立依赖并刷新 DOM。
+2. `ConnectorLine` 用 `defineComponent` + `h` + `mergeProps`：composition API 里「返回组件」的常见写法；`mergeProps(attrs, { style: … })` 保留父级传的 `class` / `:class`，并用绝对定位样式覆盖 `left/top/width/height`。
+3. `useResizeObserver(containerRef)`：只在 容器尺寸变化 时触发；若将来需要锚点自身缩放但容器不变，可再给两个锚点加 observer 或在相关 `watch` 里调 `update()`。
+
+### 在 template 中的用法示例（`part-two.vue` 已采用）
+
+<component :is="CcConnectorLine" class="line" :class="todInfo.frontBackLinkStatus" />
+
+const { ConnectorLine: CcConnectorLine } = useDomConnectorLine(
+
+  ccLineLeftRef,
+
+  ccLineRightRef,
+
+  partTwoRef,
+
+)
+
+样式仍由 `.part-two .line` 负责颜色、`opacity`、`z-index` 等；线段长度与位置由 hook 内联样式承担。
+
+```typescript
+/**
+ * 两点 DOM 锚点之间的水平连线（容器坐标系内 absolute 定位）。
+ *
+ * 设计说明：
+ * - 入参三个 Ref：from / to 为锚点元素，container 为 `position: relative|absolute` 的定位参照（与线段的 `left/top` 同源）。
+ * - 几何量放在 reactive `lineMetrics` 上，便于返回的内联组件在 render 中订阅依赖并随 ResizeObserver 更新。
+ * - `ConnectorLine` 为 `defineComponent` + `h`，可通过 `<component :is="ConnectorLine" class="line" />` 写在 template，
+ *   `class` / `style`（除 left、top、width、height 外）等 attrs 会合并进根节点；连线尺寸相关样式由 hook 写入并覆盖同名键。
+ * - 可选暴露 `update()` 用于锚点 DOM 变更、`v-if` 切换等场景下手动刷新（ResizeObserver 仅监听 container 尺寸）。
+ */
+import {
+  defineComponent,
+  h,
+  mergeProps,
+  nextTick,
+  onMounted,
+  reactive,
+  type Component,
+  type Ref,
+} from 'vue'
+import { useResizeObserver } from '@vueuse/core'
+
+export interface UseDomConnectorLineOptions {
+  /** 线段厚度（px），默认 2 */
+  lineHeight?: number
+  /** true：from 右边缘 → to 左边缘（默认）；false：from 左边缘 → to 右边缘 */
+  fromRightToLeft?: boolean
+}
+
+export interface DomConnectorLineMetrics {
+  left: string
+  top: string
+  width: string
+}
+
+/**
+ * 水平连接线Hook 接收三个Ref：from / to 为锚点元素，container 为 `position: relative|absolute` 的定位参照（与线段的 `left/top` 同源）。
+ * 返回连接线dom组件
+ * @param fromRef 起点元素Ref
+ * @param toRef 终点元素Ref
+ * @param containerRef 容器元素Ref
+ * @param options 选项
+ * @returns 连接线dom组件、连接线几何量、更新函数
+ */
+export function useDomConnectorLine(
+  fromRef: Ref<HTMLElement | null>,
+  toRef: Ref<HTMLElement | null>,
+  containerRef: Ref<HTMLElement | null>,
+  options: UseDomConnectorLineOptions = {},
+): {
+  ConnectorLine: Component
+  lineMetrics: DomConnectorLineMetrics
+  update: () => void
+} {
+  const lineHeight = options.lineHeight ?? 2
+  const fromRightToLeft = options.fromRightToLeft ?? true
+
+  const lineMetrics = reactive<DomConnectorLineMetrics>({
+    left: '0px',
+    top: '0px',
+    width: '0px',
+  })
+
+  function update() {
+    const container = containerRef.value
+    const fromEl = fromRef.value
+    const toEl = toRef.value
+    if (!container || !fromEl || !toEl) return
+
+    const c = container.getBoundingClientRect()
+    const a = fromEl.getBoundingClientRect()
+    const b = toEl.getBoundingClientRect()
+
+    const x1 = fromRightToLeft ? a.right : a.left
+    const x2 = fromRightToLeft ? b.left : b.right
+    const cy = (a.top + a.height / 2 + b.top + b.height / 2) / 2
+
+    lineMetrics.left = `${x1 - c.left}px`
+    lineMetrics.top = `${cy - c.top - lineHeight / 2}px`
+    lineMetrics.width = `${Math.max(0, x2 - x1)}px`
+  }
+
+  useResizeObserver(containerRef, update)
+
+  onMounted(() => {
+    nextTick(update)
+  })
+
+  const ConnectorLine = defineComponent({
+    name: 'DomConnectorLine',
+    inheritAttrs: false,
+    setup(_, { attrs }) {
+      return () =>
+        h(
+          'div',
+          mergeProps(attrs, {
+            style: {
+              position: 'absolute',
+              left: lineMetrics.left,
+              top: lineMetrics.top,
+              width: lineMetrics.width,
+              height: `${lineHeight}px`,
+            },
+          }),
+        )
+    },
+  })
+
+  return { ConnectorLine, lineMetrics, update }
+}
+```

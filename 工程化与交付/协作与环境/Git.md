@@ -214,6 +214,11 @@ git stash save "stash the current repository"
 | git stash drop  | 删除最近一次的stash记录                         |
 | git stash clear | 清空暂存区的所有stash                           |
 
+如果需要暂存部分文件，可以使用`git stash push`命令，使用空格将多个文件分割，同时也可使用`-m`命令自定义暂存消息：
+
+```bash
+git stash push -m "暂存A/B文本" ./src/A.text ./src/B.text
+```
 
 
 ## Git Tag

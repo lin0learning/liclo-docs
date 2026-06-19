@@ -83,7 +83,12 @@ const sidebar: DefaultTheme.Sidebar | undefined = {
         { text: 'dayjs & momentjs', link: '/工具与补充/dayjs%20momentjs' },
         { text: '设计模式', link: '/工具与补充/DesignPattern' }
       ]
-    }
+    },
+    {
+      text: '✨ Agent',
+      collapsed: false,
+      link: '/Agent'
+    },
   ],
   '/基础核心/': [
     {
@@ -184,6 +189,19 @@ const sidebar: DefaultTheme.Sidebar | undefined = {
       ]
     },
   ],
+  '/Agent/': [
+    {
+      text: 'AI Agent',
+      collapsed: false,
+      items: [
+        { text: 'Claude', link: '/Agent/Claude-EN' },
+        { text: 'Claude-CN', link: '/Agent/Claude-CN' },
+        { text: 'Claude-Fable-5', link: '/Agent/Claude-Fable-5' },
+        { text: 'Claude-Ponotail', link: '/Agent/Claude-Ponytail-EN' },
+        { text: 'Claude-Ponotail-CN', link: '/Agent/Claude-Ponytail-CN' },
+      ]
+    }
+  ]
 }
 
 export default sidebar

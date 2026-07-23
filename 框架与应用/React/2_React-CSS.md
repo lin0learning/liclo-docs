@@ -393,3 +393,97 @@ function AlertTitle({ className, ...props }: React.ComponentProps<"div">) {
 }
 ```
 :::
+
+
+
+
+
+clsx、css module与tailwind组合示例：
+```tsx
+// Button.tsx
+import React from 'react';
+import { twMerge } from 'tailwind-merge';
+import { clsx } from 'clsx';
+// 1. 导入 CSS Modules 样式文件
+import styles from './Button.module.css';
+
+// 2. 辅助函数：合并 Tailwind 类名
+const cn = (...inputs) => twMerge(clsx(inputs));
+
+export const Button = ({ 
+  children, 
+  variant = 'primary', 
+  className,
+  ...props 
+}) => {
+  // 3. 定义基础 Tailwind 类名和条件类名
+  const baseClasses = cn(
+    "px-4 py-2 rounded font-semibold transition",
+    {
+      "bg-blue-500 hover:bg-blue-600 text-white": variant === 'primary',
+      "bg-gray-200 hover:bg-gray-300 text-gray-800": variant === 'secondary',
+    },
+    // 4. 关键：将 CSS Modules 的哈希类名也放入数组
+    //    这样它会被保留，而 Tailwind 冲突依然被处理
+    styles.buttonBase, 
+    className // 允许外部传入的 Tailwind 类名覆盖
+  );
+
+  return (
+    <button className={baseClasses} {...props}>
+      {children}
+    </button>
+  );
+};
+```
+
+## `clsx` 与 `tailwind-merge` 的关系
+
+`clsx` 和 `tailwind-merge` 通常**配合使用**，解决不同问题：
+
+| 工具                 | 主要职责               | 处理能力                           |
+| :------------------- | :--------------------- | :--------------------------------- |
+| **`clsx`**           | 条件拼接类名           | 不理解类名含义，只是简单拼接字符串 |
+| **`tailwind-merge`** | 解决 Tailwind 类名冲突 | 识别 Tailwind 类名，自动覆盖冲突项 |
+
+### 典型组合用法
+
+jsx
+
+```
+import clsx from 'clsx';
+import { twMerge } from 'tailwind-merge';
+
+// 合并为一个便捷函数
+const cn = (...inputs) => twMerge(clsx(inputs));
+
+function Button({ className }) {
+  return (
+    <button 
+      className={cn(
+        'px-4 py-2 bg-blue-500',  // 基础样式
+        'bg-red-500',              // 会覆盖上面的 bg-blue-500
+        className                  // 外部传入的类名也会被正确处理冲突
+      )}
+    >
+      按钮
+    </button>
+  );
+}
+```
+
+
+
+## 💡 为什么不用模板字符串？
+
+jsx
+
+```
+// ❌ 模板字符串的痛点
+className={`base ${isActive ? 'active' : ''} ${isLarge ? 'large' : ''}`}
+// 问题：会有多余空格、需要手动处理假值、可读性差
+
+// ✅ clsx 的优势
+className={clsx('base', isActive && 'active', isLarge && 'large')}
+// 简洁、自动过滤假值、易于扩展
+```

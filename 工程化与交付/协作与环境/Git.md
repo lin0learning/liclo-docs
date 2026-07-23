@@ -696,5 +696,70 @@ git submodule update
       git remote -v
       ```
 
-      
 
+
+
+## 忽略文件
+
+通常在 `.gitignore` 文件中添加 文件或路径的忽略。
+
+
+
+`update-index --skip-worktree`：用于**临时忽略对已跟踪文件的本地修改**的指令。它告诉 Git："这个文件在工作区中的改动，请忽略掉，继续使用索引中记录的版本。"
+
+**核心用法**
+
+1. 标记文件，忽略本地改动
+   ```bash
+   git update-index --skip-worktree <文件路径>
+   ```
+
+   
+
+2. 取消标记，恢复跟踪
+   ```bash
+   git update-index --no-skip-worktree <文件路径>
+   ```
+
+3. 查看当前标记状态
+   ```bash
+   git ls-files -v
+   ```
+
+**与 `--asume-unchanged` 的区别**
+
+`--skip-worktree` 的设计初衷是供 Git 的 **sparse-checkout** 功能使用，用于标记那些不在工作区范围内的文件。而 `--assume-unchanged` 主要用于性能优化，告诉 Git 在文件系统缓慢时跳过对文件的检查。核心区别体现在功能上：
+
+- `--skip-worktree`：当从远程拉取更新时，如果该文件有变动，Git 会**自动取消**其 `skip-worktree` 标记，尝试合并更新。这个设计更安全，不容易出现意外覆盖。
+- `--assume-unchanged`：如果该文件在远程有了更新，Git 可能会拒绝合并或切换分支，导致操作失败，需要你手动处理。
+
+**典型使用场景与注意事项**
+
+- **适用场景**：最适合用来在本地保留一些**配置文件（如 `.env`、`config.local.js`）的个性化修改**，而不担心它们被意外提交到仓库中。
+- **并非“永久忽略”**：这只是一个“懒人”标记。当上游分支更新了这个文件（例如别人改了 `config.js`），你执行 `git pull` 时，Git 为了安全起见会取消这个标记，你需要处理可能的合并冲突。
+- **不是 `.gitignore`**：该文件**依然是 Git 仓库的一部分**，只是本地改动被暂时忽略。`.gitignore` 用于忽略**从未被跟踪**的文件，二者不能混淆。
+
+
+
+## 线性提交
+
+基于主分支合并，feature分支开发的线性提交基准，原则如下：
+
+1. 主分支只执行 `merge` 操作，合并feature或其他分支的提交；
+2. feature 分支正常 `commit`，为了保持子分支的线性，不产生合并干扰，只使用 rebase 来同步主分支的更新；
+
+以`feature-a`分支举例，同步 `develop` 分支的更新步骤为：
+
+```bash
+git fetch origin develop:develop # 更新本地的 develop 分支
+git rebase develop               # rebase develop 分支
+```
+
+也可以在 feature 分支上一条命令执行：
+
+```bash
+git fetch
+git pull --rebase origin develop
+```
+
+这会直接从远程的 develop 分支拉取并 rebase，省去了切换分支的步骤。

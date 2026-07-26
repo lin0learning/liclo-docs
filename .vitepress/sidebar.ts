@@ -194,11 +194,9 @@ const sidebar: DefaultTheme.Sidebar | undefined = {
       text: 'AI Agent',
       collapsed: false,
       items: [
-        { text: 'Claude', link: '/Agent/Claude-EN' },
-        { text: 'Claude-CN', link: '/Agent/Claude-CN' },
-        { text: 'Claude-Fable-5', link: '/Agent/Claude-Fable-5' },
-        { text: 'Claude-Ponotail', link: '/Agent/Claude-Ponytail-EN' },
-        { text: 'Claude-Ponotail-CN', link: '/Agent/Claude-Ponytail-CN' },
+        { text: 'Agent', link: '/Agent/Agent.md' },
+        { text: 'Learn MattPocock Skills', link: '/Agent/Learn Matt Pocock skills.md' },
+        { text: 'Ponytail', link: '/Agent/Ponytail.md'}
       ]
     }
   ]

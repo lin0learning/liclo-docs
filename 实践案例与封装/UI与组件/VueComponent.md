@@ -324,19 +324,19 @@ src/composables/useDomConnectorLine.ts
 2. `ConnectorLine` 用 `defineComponent` + `h` + `mergeProps`：composition API 里「返回组件」的常见写法；`mergeProps(attrs, { style: … })` 保留父级传的 `class` / `:class`，并用绝对定位样式覆盖 `left/top/width/height`。
 3. `useResizeObserver(containerRef)`：只在 容器尺寸变化 时触发；若将来需要锚点自身缩放但容器不变，可再给两个锚点加 observer 或在相关 `watch` 里调 `update()`。
 
-### 在 template 中的用法示例（`part-two.vue` 已采用）
+### 在 template 中的用法示例
 
+```vue
 <component :is="CcConnectorLine" class="line" :class="todInfo.frontBackLinkStatus" />
 
 const { ConnectorLine: CcConnectorLine } = useDomConnectorLine(
-
   ccLineLeftRef,
-
   ccLineRightRef,
-
   partTwoRef,
-
 )
+```
+
+
 
 样式仍由 `.part-two .line` 负责颜色、`opacity`、`z-index` 等；线段长度与位置由 hook 内联样式承担。
 
